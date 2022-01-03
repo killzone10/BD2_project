@@ -1,0 +1,52 @@
+{%extends 'base.html' %}
+{% block head %}
+
+{%endblock%}
+{% block body %}
+<div class = "button" >
+  <form action = "/" method = "get">
+    <input type = "submit" class ="submit" value = "Wróć">
+  </form>
+</div>
+  <table class="table">
+    <tr>
+      <th>Wyciągniete z bazy danych</th>
+      <th>Odczytane</th>
+      <th>Odległość</th>
+      <th>Wynik</th>
+    </tr>
+    {% for row in list %}
+      {% set outer_loop = loop %}
+      <tr>
+        {%for element in row %}
+            
+          {%if loop.index0 == 1 %}
+            {% set count = namespace(value=0) %}
+            <td>
+              {%for s in element %}
+                {%if loop.index0 == index[outer_loop.index0][count.value] %}
+                  <span class="span" style="color:red">{{s}}</span>
+                    {% set count.value = count.value + 1 %}
+                {%else%}
+                  <span class = "span" style="color:black">{{s}}</span>
+                {%endif%}
+              {%endfor%}
+            </td>
+          {%else%}
+            <td>
+              <span class = "normal"> {{element}}</span>
+            </td>
+          {%endif%}
+        {%endfor%}
+                    
+        <!-- <td>{{row[element]}}</td> -->
+        <!-- <td>{{element}},{{loop.index0}}</td> -->
+        <!-- <td>1</td> -->
+        
+      </tr> 
+    {%endfor%}
+  </table>
+  <div class="img">
+    <img src="{{url_for('picture')}}">
+  </div>
+{% endblock %}

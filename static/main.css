@@ -1,0 +1,210 @@
+body {
+  background: #fafafa;
+  color: #333333;
+  margin-top: 5rem;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #444444;
+}
+
+.bg-steel {
+  background-color: #5f788a;
+}
+
+.site-header .navbar-nav .nav-link {
+  color: #cbd5db;
+}
+
+.site-header .navbar-nav .nav-link:hover {
+  color: #ffffff;
+}
+
+.site-header .navbar-nav .nav-link.active {
+  font-weight: 500;
+}
+
+.content-section {
+  background: #ffffff;
+  padding: 10px 20px;
+  border: 1px solid #dddddd;
+  border-radius: 3px;
+  margin-bottom: 20px;
+}
+
+.article-title {
+  color: #444444;
+}
+
+a.article-title:hover {
+  color: #428bca;
+  text-decoration: none;
+}
+
+.article-content {
+  white-space: pre-line;
+}
+
+.article-img {
+  height: 65px;
+  width: 65px;
+  margin-right: 16px;
+}
+
+.article-metadata {
+  padding-bottom: 1px;
+  margin-bottom: 4px;
+  border-bottom: 1px solid #e3e3e3
+}
+
+.article-metadata a:hover {
+  color: #333;
+  text-decoration: none;
+}
+
+.article-svg {
+  width: 25px;
+  height: 25px;
+  vertical-align: middle;
+}
+
+.account-img {
+  height: 125px;
+  width: 125px;
+  margin-right: 20px;
+  margin-bottom: 16px;
+}
+
+.account-heading {
+  font-size: 2.5rem;
+}
+
+.dropdown {
+ background-color: tomato;
+  color: white;
+  border: 2px solid black;
+  margin: 20px;
+  padding: 20px;
+}
+select { width: 400px;
+ height:120px;
+ background-color: #4CAF50;
+ text-align-last:center;
+ font-size:1.2rem;
+ /* background-color :powderblue; */
+  margin-right: 20px;
+  margin-top:40px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+
+}
+
+.submit {
+  position: relative;
+  bottom: 0;
+  right: 0;
+  width: 150px;
+  height: 50px;
+  border: 3px solid #73AD21;
+  transition: all 0.5s 0s;
+
+ }
+ .submit:hover{
+   background:#7272c4;
+
+ }
+ .button {
+ position : fixed;
+  right:5%;
+  bottom:15%;
+  padding: 15px 32px;
+   display: inline-block;
+ }
+ .button1 {
+  position : fixed;
+   right:5%;
+   bottom:25%;
+   padding: 15px 32px;
+    display: inline-block;
+  }
+ *{
+   margin:0;
+   padding:0;
+
+ }
+ .taskbar{
+   text-align: center;
+   margin:50px 0px 0px 30px;
+   position:absolute;
+   left:25%;
+   /* border:2px solid red; */
+ }
+ .poza{
+   margin:15px 15px 15px 15px;
+   height:150px;
+   position:absolute;
+   
+ }
+ 
+.header{
+  font-size:40px;
+  text-align: center;
+  box-sizing:border-box;
+  width:70vw;
+
+}
+/* .header1{
+  font-size:40px;
+  text-align: center;
+  box-sizing:border-box;
+
+  width:80vw;
+  margin-bottom: 30px;
+} */
+.Instrukcja{
+  position: absolute;
+  top:60vh;
+  left:20vh;
+  font-size:24px;
+}
+.drukarki{
+  box-sizing:border-box;
+  font-size:12px;
+  width:20vw;
+
+  border:red 3px solid;
+}
+.screen{
+  text-align: center;
+  margin-top: 5   0px;
+  /* border:red solid 2px; */
+  padding:20px;
+}
+.buttony{
+  text-align: center;
+}
+.table{
+  border:2px solid royalblue;
+  font-size:20px;
+}
+/* th{
+text-decoration:underline;
+text-align: center;
+} */
+
+.span{
+  margin:0;
+  padding:0;
+  border:0;
+  letter-spacing: 0px;
+  
+}
+.normal{
+  letter-spacing:4px;
+
+}
+.img{
+  text-align:center;
+  margin-top:20px;
+  margin-left:auto;
+  margin-right:auto;
+}

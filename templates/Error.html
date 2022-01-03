@@ -1,0 +1,13 @@
+{%extends 'base.html' %}
+{% block head %}
+Error
+{%endblock%}
+{% block body %}
+  <h2 class="header"> Error - błąd odczytu z bazy danych </h2>
+  <br><br>
+ <h3>Sprawdź czy została wybrana poprawna drukarka!</h3>
+ <div class = "button" >
+  <form action = "/" method = "get">
+    <input type = "submit" class ="submit" value = "Wróć">
+  </form>
+{% endblock %}

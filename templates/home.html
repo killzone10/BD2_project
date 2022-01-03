@@ -1,0 +1,28 @@
+{%extends 'base.html' %}
+{% block head %}
+{%endblock%}
+{% block body %}
+  <h1 class = "header"> Wybierz drukarke </h1>
+  
+  <div class = "taskbar">
+    <form action = "#" method = "post">
+      <select name="printer" method="GET" action="/">
+        <option value="{{printers[0]}}" selected>{{printers[0]}}</option>
+        {% for printer in printers[1:] %}
+          <option value="{{printer}}">{{printer}}</option>
+      
+        {% endfor %}        
+         <input type = "submit" value = "Submit" class="submit">
+
+      </select>
+    </form>
+    </div>
+    <div class ="Instrukcja">
+      <ol>
+        <li>Wybierz drukarke z której drukowana była etykieta.</li>
+        <li>Wciśnij przycisk "Potwierdź". </li>
+        <li> W razie pomyłki użyj przycisku "Wróć".</li>
+        <li>Przybliż obiektyw i wykonaj zdjęcie tak, by na ekranie był tylko sprawdzany tekst.</li>
+      </ol>
+    </div>
+{% endblock %}

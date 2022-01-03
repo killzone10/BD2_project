@@ -1,0 +1,17 @@
+{%extends 'base.html' %}
+{% block head %}
+
+{%endblock%}
+{% block body %}
+<div class="header">
+<h1> Stronka </h1>
+
+<div class="drukarki">
+  {% for printer in printers %}
+      <p>{{printer}}</p>  
+   
+  {%endfor %}
+</div>
+</div>
+<div>Instrukcja</div>
+{% endblock %}

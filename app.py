@@ -1,7 +1,9 @@
 from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file
 from flask_sqlalchemy import SQLAlchemy
 import time,datetime
-
+from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy.orm import relationship
+from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 
 
@@ -10,7 +12,7 @@ from sqlalchemy.orm import backref
 app = Flask(__name__, template_folder='./templates')
 
 app.secret_key = '\xea\x1a\xb2\x8a\xefk\xd6V%\xf7\xb4\xe5\xa9\r=&'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:linux123@localhost/products'
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:linux123@localhost/products' ## postgres ://nazwa uzytkownima : haslo @ localhost/nazwa bazy danych
 
 db = SQLAlchemy(app)
 
@@ -19,17 +21,92 @@ product_is_favourite = db.Table('product_is_favourite', db.Model.metadata,
     db.Column('user.id', db.Integer,db.ForeignKey('user.id'))
     )
 
+product_has_cart = db.Table('product_has_cart', db.Model.metadata,
+    db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
+    db.Column('cart.id', db.Integer,db.ForeignKey('cart.id'))
+    )
+
+product_has_order = db.Table('product_has_order', db.Model.metadata,
+    db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
+    db.Column('order.id', db.Integer,db.ForeignKey('order.id'))
+    )
 class Product(db.Model):
-    __tablename__ ="product" # niepotrzebne
+    __tablename__ ="product" 
     id = db.Column(db.Integer,primary_key = True)
     name = db.Column(db.String(25))
     price = db.Column(db.Integer)
     quantity = db.Column(db.Integer)
     description = db.Column(db.String(25))
-    favourite = db.relationship("User",secondary =product_is_favourite)
-    comments = db.relationship("Comment",backref = "Product")
+
+    
+    favourite = db.relationship("User",secondary = product_is_favourite)
+    comments = db.relationship("Comment",backref = "Comment")
+    has_cart = db.relationship("Cart",secondary = product_has_cart)
+    brand_id = db.Column(db.Integer,db.ForeignKey('brand.id'),nullable = False)
+    type_id = db.Column(db.Integer,db.ForeignKey('product_type.id'),nullable = False)
+    has_order = db.relationship("Order", secondary = product_has_order)
+    sectors = db.Column(db.Integer,db.ForeignKey('sector.id'),nullable = False)
+    warehouses = db.Column(db.Integer,db.ForeignKey('warehouse.id'),nullable = False)
+
+    
     def __repr__(self):
         return f"Product('{self.name}','{self.price}','{self.quantity}')"
+
+
+class Order(db.Model):
+    __tablename__="order"
+    id = db.Column(db.Integer, primary_key = True)
+    date = db.Column(db.DateTime, nullable = False)
+    status = db.Column(db.Integer, nullable = False)
+    first_name = db.Column(db.String(15), nullable = False)
+    second_name = db.Column(db.String(15), nullable = False)
+    address = db.Column(db.String(15), nullable = False)
+    email = db.Column(db.String(20), nullable = False)
+    postal_code = db.Column(db.String(20), nullable = False)
+    total_price = db.Column(db.Float, nullable = False)
+    phone = db.Column(db.Integer, nullable = True)
+    
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False) 
+    invoice_id = db.Column(db.Integer,db.ForeignKey('invoice.id'),nullable = False, unique = True)
+    def __repr__(self):
+        return f"Order('{self.name}','{self.price}','{self.quantity}')"
+    
+
+class Invoice(db.Model):
+    __tablename__="invoice"
+    id = db.Column(db.Integer, primary_key = True)
+    first_name = db.Column(db.String(15), nullable = False)
+    second_name = db.Column(db.String(15), nullable = False)
+    adress = db.Column(db.String(15), nullable = False)
+    data = db.Column(db.DateTime, nullable = False, default = datetime.datetime.now())
+    seller = db.Column(db.String(15), nullable = False)
+    identification_number = db.Column(db.Integer)
+    order = db.relationship("Order",backref=backref("Order", uselist=False))
+
+
+
+
+class Brand(db.Model):
+    __tablename__="brand"
+    id = db.Column(db.Integer,primary_key = True)
+    description = db.Column(db.String(25),nullable = False)
+    product_id = db.relationship('Product',backref = "Produkt")
+class Product_type(db.Model):   
+    __tablename__="product_type"
+    id = db.Column(db.Integer, primary_key = True)
+    title = db.Column(db.String(45), nullable = False) 
+    product_id = db.relationship('Product',backref = "Produkt")
+    parent = db.relationship('Tag', remote_side=[id])
+    parent_id = db.Column(db.Integer, db.ForeignKey('product_type.id'), nullable = True)
+    
+
+class Cart(db.Model):
+     __tablename__ ="cart" 
+     id = db.Column(db.Integer,primary_key = True)
+     user = relationship("User",back_populates="cart",uselist = False)
+    #  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    #  user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
+     
 
 
 
@@ -57,15 +134,27 @@ class User(db.Model): #1
     id = db.Column(db.Integer,primary_key=True)
     username = db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
     password = db.Column(db.String(30),nullable=False)
-    email = db.Column(db.String(120),unique=True,nullable=False)
+    email = db.Column(db.String(20),unique=True,nullable=False)
     first_name = db.Column(db.String(30),nullable=False)
     second_name = db.Column(db.String(30),nullable=True)
     phone = db.Column(db.Integer)
     postal_code = db.Column(db.Integer)
 
+    product_id = db.Column(db.Integer,db.ForeignKey('product.id'), nullable = False) 
     comments = db.relationship('Comment',backref = 'author', lazy = True) # backref dodajemy kolumne do Comment lazy true sql alchemy load TRUE asap
     # roles = db.relationship('User_role',backref = 'User_role',lazy = True) DOKONCZ RELACJE wiele do wielu
     roles = db.relationship("Role",secondary = user_role)
+    orders = db.relationship('Order',backref = 'Order', lazy = True) # backref dodajemy kolumne do Comment lazy true sql alchemy load TRUE asap
+
+
+    cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'),unique = True)
+    # cart = db.relationship("Cart",backref=backref("User", uselist=False))
+    cart = db.relationship("Cart",back_populates = "User")
+    # cart = db.relationship("Cart",uselist = False,backref = "user")
+
+    
+
+
     def __repr__(self): # wyspeciikujemy klase z relacja
         return f"User('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
@@ -82,10 +171,10 @@ class Warehouse(db.Model):
     max_capacity = db.Column(db.Integer, nullable=False)
     address = db.Column(db.String(30), nullable=False)
     postal_code = db.Column(db.String(6), nullable=False)#!!! miasto z postal code zrobic jako oddzielna encje w 3PN
-    
+    product_id = db.relationship('Product',backref = "Produkt")
     sectors = db.relationship('Sector', backref = 'warehouse')
     def __repr__(self):
-        return f"Warehouses('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Warehouse('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
 class Sector(db.Model):
     __tablename__ ="sector" 
@@ -95,8 +184,9 @@ class Sector(db.Model):
 
     warehouse_id = db.Column(db.Integer,db.ForeignKey('warehouse.id'), nullable = False)
     workers = db.relationship('Worker', backref = 'sector')
+    product_id = db.relationship('Product',backref = "Produkt")
     def __repr__(self):
-        return f"Sectors('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Sector('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
 class Worker(db.Model):
     __tablename__ ="worker" 
@@ -109,38 +199,7 @@ class Worker(db.Model):
     sector_id = db.Column(db.Integer,db.ForeignKey('sector.id'), nullable = False)
     parent = db.relationship('Tag', remote_side=[id])
     def __repr__(self):
-        return f"Workers('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
-
-
-
-# class User_role(db.Model):
-#     user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
-#     role_id = db.Column(db.Integer,db.ForeignKey('role.id'),nullable = False)
-    
-# class Role(db.Model):
-#     id = db.Column(db.Integer,primary_key=True,nullable = False)
-#     name = db.Column(db.String(50),unique = False, nullable = True)
-#     user_role = db.relationship('User_role',backref = "")
- 
-
-# class User(db.Model):
-#     id = db.Column(db.Integer,primary_key=True)
-#     username=db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
-#     email=db.Column(db.String(120),unique=True,nullable=False) 
-#     password=db.Column(db.String(30),nullable=False)
-
-#     def __repr__(self):
-#         return f"Products('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
-
-
-# class User(db.Model):
-#     id = db.Column(db.Integer,primary_key=True)
-#     username=db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
-#     email=db.Column(db.String(120),unique=True,nullable=False) 
-#     password=db.Column(db.String(30),nullable=False)
-
-#     def __repr__(self):
-#         return f"e('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Worker('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
 
 

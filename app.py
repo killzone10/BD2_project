@@ -1,18 +1,27 @@
-from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file
+from turtle import back
+from xmlrpc.client import Boolean
+from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
 from flask_sqlalchemy import SQLAlchemy
 import time,datetime
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
-
+from forms import RegistrationForm,LoginForm
 
 
 
 app = Flask(__name__, template_folder='./templates')
 
-app.secret_key = '\xea\x1a\xb2\x8a\xefk\xd6V%\xf7\xb4\xe5\xa9\r=&'
+# app.secret_key = '\xea\x1a\xb2\x8a\xefk\xd6V%\xf7\xb4\xe5\xa9\r=&'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:linux123@localhost/products' ## postgres ://nazwa uzytkownima : haslo @ localhost/nazwa bazy danych
+app.config['SECRET_KEY']='f027a3f2e1b601db1ae08006930c074f'
+
+
+
+
+
+
 
 db = SQLAlchemy(app)
 
@@ -58,16 +67,16 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     date = db.Column(db.DateTime, nullable = False)
     status = db.Column(db.Integer, nullable = False)
-    first_name = db.Column(db.String(15), nullable = False)
-    second_name = db.Column(db.String(15), nullable = False)
-    address = db.Column(db.String(15), nullable = False)
-    email = db.Column(db.String(20), nullable = False)
-    postal_code = db.Column(db.String(20), nullable = False)
+        # first_name = db.Column(db.String(15), nullable = False)
+        # second_name = db.Column(db.String(15), nullable = False)
+        # address = db.Column(db.String(15), nullable = False)
+        # email = db.Column(db.String(20), nullable = False)
+        # postal_code = db.Column(db.String(20), nullable = False)
     total_price = db.Column(db.Float, nullable = False)
-    phone = db.Column(db.Integer, nullable = True)
-    
+    adress_id = db.Column(db.Integer,db.ForeignKey("address.id"))
+    address = relationship("Address")
+    # phone = db.Column(db.Integer, nullable = True)
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False) 
-    invoice_id = db.Column(db.Integer,db.ForeignKey('invoice.id'),nullable = False, unique = True)
     def __repr__(self):
         return f"Order('{self.name}','{self.price}','{self.quantity}')"
     
@@ -75,13 +84,18 @@ class Order(db.Model):
 class Invoice(db.Model):
     __tablename__="invoice"
     id = db.Column(db.Integer, primary_key = True)
-    first_name = db.Column(db.String(15), nullable = False)
-    second_name = db.Column(db.String(15), nullable = False)
-    adress = db.Column(db.String(15), nullable = False)
+    # first_name = db.Column(db.String(15), nullable = False)
+    # second_name = db.Column(db.String(15), nullable = False)
+    # address = db.Column(db.String(15), nullable = False)
     data = db.Column(db.DateTime, nullable = False, default = datetime.datetime.now())
     seller = db.Column(db.String(15), nullable = False)
     identification_number = db.Column(db.Integer)
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False, unique = True)
     order = db.relationship("Order",backref=backref("Order", uselist=False))
+    # order_id = db.Column(db.Integer,db.ForeignKey('order.id'),nullable = False, unique = True)
+
+    address_id = db.Column(db.Integer,db.ForeignKey("address.id"))
+    address = relationship("Address",backref = backref("Invoice",uselist = False))
 
 
 
@@ -91,6 +105,7 @@ class Brand(db.Model):
     id = db.Column(db.Integer,primary_key = True)
     description = db.Column(db.String(25),nullable = False)
     product_id = db.relationship('Product',backref = "Produkt")
+
 class Product_type(db.Model):   
     __tablename__="product_type"
     id = db.Column(db.Integer, primary_key = True)
@@ -138,9 +153,9 @@ class User(db.Model): #1
     first_name = db.Column(db.String(30),nullable=False)
     second_name = db.Column(db.String(30),nullable=True)
     phone = db.Column(db.Integer)
-    postal_code = db.Column(db.Integer)
+    # postal_code = db.Column(db.Integer)
 
-    product_id = db.Column(db.Integer,db.ForeignKey('product.id'), nullable = False) 
+    # product_fav_id = db.Column(db.Integer,db.ForeignKey   ('product.id'), nullable = False) 
     comments = db.relationship('Comment',backref = 'author', lazy = True) # backref dodajemy kolumne do Comment lazy true sql alchemy load TRUE asap
     # roles = db.relationship('User_role',backref = 'User_role',lazy = True) DOKONCZ RELACJE wiele do wielu
     roles = db.relationship("Role",secondary = user_role)
@@ -169,10 +184,13 @@ class Warehouse(db.Model):
     __tablename__ ="warehouse" 
     id = db.Column(db.Integer, primary_key = True)
     max_capacity = db.Column(db.Integer, nullable=False)
-    address = db.Column(db.String(30), nullable=False)
-    postal_code = db.Column(db.String(6), nullable=False)#!!! miasto z postal code zrobic jako oddzielna encje w 3PN
+    # address = db.Column(db.String(30), nullable=False)
+    # postal_code = db.Column(db.String(6), nullable=False)#!!! miasto z postal code zrobic jako oddzielna encje w 3PN
     product_id = db.relationship('Product',backref = "Produkt")
     sectors = db.relationship('Sector', backref = 'warehouse')
+
+    address_id = db.Column(db.Integer,db.ForeignKey('address.id'))
+    address = relationship("Address",backref = backref("Warehouse",uselist = False))
     def __repr__(self):
         return f"Warehouse('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
@@ -202,6 +220,30 @@ class Worker(db.Model):
         return f"Worker('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
 
 
+class Address(db.Model):
+    __tablename__ = "address"
+    id = db.Column(db.Integer, primary_key = True)
+    # country = db.Column(db.String(70),nullable  = False)
+    # city = db.Column(db.String(70),nullable = False)
+    street = db.Column(db.String(70),nullable = True)
+    house_nr = db.Column(db.Integer, nullable = False) 
+    postal_code = db.Column(db.String(15), nullable = False)
+    # postal_code = db.Column(db.String(15), nullable = False)
+    city_id = db.Column(db.Integer,db.ForeignKey('city.id'),nullable = False)
+
+
+    #city relationship
+    
+
+
+class City(db.Model):
+    __tablename__= 'city'
+    id = db.Column(db.Integer,primary_key=True)
+    country = db.Column(db.String(70),nullable  = False)
+    name = db.Column(db.String(70),nullable = False) 
+    address_id = db.relationship('Address',backref = "Address")
+
+
 
 
 # db.create_all()
@@ -218,9 +260,26 @@ def index():
         return render_template('index.html')
 
 
-# @app.route("/about")
-# def about():
-#     return render_template('index.html',printers = printers, title = "Ekran")
+@app.route("/about")
+def about():
+    return render_template('error.html', title = "Ekran")
+
+@app.route("/products")
+def products():
+    return render_template('products.html',title = "Products")
+
+@app.route("/register",methods = ['GET','POST'])
+def register():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        flash(f'Account created for {form.username.data}!','success')
+        return redirect(url_for('index'))
+    return render_template('register.html',title = "Register",form = form)
+
+@app.route("/login")
+def login():
+    form = LoginForm()
+    return render_template('login.html',title = "Login",form = form)
 # @app.route("/tasks", methods=['POST', 'GET'])
 # def tasks():
 #     global switch, camera,res,res1

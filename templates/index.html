@@ -4,14 +4,19 @@
 {%endblock%}
 {% block body %}
 <div class="header">
-<h1> Stronka </h1>
-
-<div class="drukarki">
-  {% for printer in printers %}
-      <p>{{printer}}</p>  
-   
-  {%endfor %}
+<h1> Witaj w sklepie RYBEX </h1>
+<img src="{{url_for('static', filename='pobrane.png')}}" />
 </div>
+<div class = "ind" >
+  <h2 class = "header"> Wybór</h2>
+  <div class="buttony">
+    
+    <form method="post" action="{{url_for('index') }}">
+      <input type="submit" class ="submit" value="Log in" name="log"  />
+      <input type="submit" class ="submit" value="Sign up" name="sign" />
+      <input type="submit" class ="submit" value="Products" name="product" />
+      <!-- <input type = "submit" class ="submit" value = "Wróć" name ='back'> -->
+      </form>
+  </div>
 </div>
-<div>Instrukcja</div>
 {% endblock %}

@@ -1,1 +1,1 @@
-db.create_all()
+postgresql://postgres:linux123@localhost/products'

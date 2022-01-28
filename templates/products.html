@@ -2,19 +2,11 @@
 {% block head %}
 {%endblock%}
 {% block body %}
-  <h1 class = "header"> Wybierz drukarke </h1>
+  <h1 class = "header"> Produkty </h1>
   
   <div class = "taskbar">
     <form action = "#" method = "post">
-      <select name="printer" method="GET" action="/">
-        <option value="{{printers[0]}}" selected>{{printers[0]}}</option>
-        {% for printer in printers[1:] %}
-          <option value="{{printer}}">{{printer}}</option>
-      
-        {% endfor %}        
-         <input type = "submit" value = "Submit" class="submit">
-
-      </select>
+  
     </form>
     </div>
     <div class ="Instrukcja">

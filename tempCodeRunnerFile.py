@@ -1,1 +1,1 @@
-postgresql://postgres:linux123@localhost/products'
+t app

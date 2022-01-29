@@ -107,9 +107,11 @@ select { width: 400px;
   /* border: 3px solid #73AD21; */
   transition: all 0.5s 0s;
   background:rgb(135, 135, 238);
+  border-radius: 15px;
  }
  .submit:hover{
    background:#0b0bf0;  
+   color:#ffffff;
 
  }
  .button {
@@ -191,10 +193,13 @@ select { width: 400px;
 }
 .buttony{
   text-align: center;
+  border-radius: 25px;
+  padding: 20px;
 }
 .table{
   border:2px solid royalblue;
   font-size:20px;
+  
 }
 /* th{
 text-decoration:underline;
@@ -217,5 +222,13 @@ text-align: center;
   margin-top:20px;
   margin-left:auto;
   margin-right:auto;
+}
+
+.fish{
+  transition: all 0.5s 0s;
+}
+.fish:hover{
+  transform:rotate(30deg) scale(0.8, 0.8);
+
 }
 

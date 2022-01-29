@@ -1,29 +1,11 @@
-from turtle import back
-from xmlrpc.client import Boolean
-from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
-from flask_sqlalchemy import SQLAlchemy
 import time,datetime
+from app import db,login_manager
+from flask_login import UserMixin
+
 from sqlalchemy import Table, Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
-from forms import RegistrationForm,LoginForm
-
-
-
-app = Flask(__name__, template_folder='./templates')
-
-# app.secret_key = '\xea\x1a\xb2\x8a\xefk\xd6V%\xf7\xb4\xe5\xa9\r=&'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://postgres:linux123@localhost/products' ## postgres ://nazwa uzytkownima : haslo @ localhost/nazwa bazy danych
-app.config['SECRET_KEY']='f027a3f2e1b601db1ae08006930c074f'
-
-
-
-
-
-
-
-db = SQLAlchemy(app)
 
 product_is_favourite = db.Table('product_is_favourite', db.Model.metadata,
     db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
@@ -78,7 +60,7 @@ class Order(db.Model):
     # phone = db.Column(db.Integer, nullable = True)
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False) 
     def __repr__(self):
-        return f"Order('{self.name}','{self.price}','{self.quantity}')"
+        return f"Order('{self.date}','{self.total_price}','{self.adress_id}')"
     
 
 class Invoice(db.Model):
@@ -91,12 +73,14 @@ class Invoice(db.Model):
     seller = db.Column(db.String(15), nullable = False)
     identification_number = db.Column(db.Integer)
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False, unique = True)
-    order = db.relationship("Order",backref=backref("Order", uselist=False))
-    # order_id = db.Column(db.Integer,db.ForeignKey('order.id'),nullable = False, unique = True)
+    # order_id = db.relationship("Order",backref=backref("Order", uselist=False))
+    order_id = db.Column(db.Integer,db.ForeignKey('order.id'),nullable = False, unique = True)
 
     address_id = db.Column(db.Integer,db.ForeignKey("address.id"))
     address = relationship("Address",backref = backref("Invoice",uselist = False))
-
+    def __repr__(self):
+        return f"Invoice('{self.data}','{self.seller}','{self.identification_number}')"
+    
 
 
 
@@ -105,20 +89,23 @@ class Brand(db.Model):
     id = db.Column(db.Integer,primary_key = True)
     description = db.Column(db.String(25),nullable = False)
     product_id = db.relationship('Product',backref = "Produkt")
+    def __repr__(self):
+        return f"Brand('{self.id}','{self.description}','{self.product_id}')"
+    
 
 class Product_type(db.Model):   
     __tablename__="product_type"
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(45), nullable = False) 
-    product_id = db.relationship('Product',backref = "Produkt")
-    parent = db.relationship('Tag', remote_side=[id])
+    product_id = db.relationship('Product',backref = "Product_id")
+    parent = db.relationship('Product_type', remote_side=[id])
     parent_id = db.Column(db.Integer, db.ForeignKey('product_type.id'), nullable = True)
     
 
 class Cart(db.Model):
      __tablename__ ="cart" 
      id = db.Column(db.Integer,primary_key = True)
-     user = relationship("User",back_populates="cart",uselist = False)
+     User = relationship("User",back_populates="cart",uselist = False)
     #  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     #  user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
      
@@ -144,14 +131,18 @@ user_role = db.Table('user_role', db.Model.metadata,
     db.Column('role.id',db.Integer, db.ForeignKey('role.id'))
     )
 
-class User(db.Model): #1
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
+
+class User(db.Model,UserMixin): #1
     __tablename__ ="user" 
-    id = db.Column(db.Integer,primary_key=True)
+    id = db.Column(db.Integer,primary_key=True) 
     username = db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
-    password = db.Column(db.String(30),nullable=False)
+    password = db.Column(db.String(70),nullable=False)
     email = db.Column(db.String(20),unique=True,nullable=False)
-    first_name = db.Column(db.String(30),nullable=False)
-    second_name = db.Column(db.String(30),nullable=True)
+    first_name = db.Column(db.String(40),nullable=True)
+    second_name = db.Column(db.String(40),nullable=True)
     phone = db.Column(db.Integer)
     # postal_code = db.Column(db.Integer)
 
@@ -171,7 +162,7 @@ class User(db.Model): #1
 
 
     def __repr__(self): # wyspeciikujemy klase z relacja
-        return f"User('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"User('{self.username}','{self.password}','{self.email}')"
 
 class Role(db.Model):
     __tablename__ ="role" 
@@ -186,13 +177,13 @@ class Warehouse(db.Model):
     max_capacity = db.Column(db.Integer, nullable=False)
     # address = db.Column(db.String(30), nullable=False)
     # postal_code = db.Column(db.String(6), nullable=False)#!!! miasto z postal code zrobic jako oddzielna encje w 3PN
-    product_id = db.relationship('Product',backref = "Produkt")
-    sectors = db.relationship('Sector', backref = 'warehouse')
+    product_id = db.relationship('Product',backref = "Product")
+    sectors = db.relationship('Sector', backref = 'Warehouse')
 
     address_id = db.Column(db.Integer,db.ForeignKey('address.id'))
     address = relationship("Address",backref = backref("Warehouse",uselist = False))
     def __repr__(self):
-        return f"Warehouse('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Warehouse('{self.max_capacity}','{self.id}')"
 
 class Sector(db.Model):
     __tablename__ ="sector" 
@@ -201,10 +192,10 @@ class Sector(db.Model):
     max_capacity = db.Column(db.Integer, nullable=False)
 
     warehouse_id = db.Column(db.Integer,db.ForeignKey('warehouse.id'), nullable = False)
-    workers = db.relationship('Worker', backref = 'sector')
-    product_id = db.relationship('Product',backref = "Produkt")
+    workers = db.relationship('Worker', backref = 'Sector')
+    product_id = db.relationship('Product',backref = "Product1")
     def __repr__(self):
-        return f"Sector('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Sector('{self.max_capacity}','{self.name}')"
 
 class Worker(db.Model):
     __tablename__ ="worker" 
@@ -215,9 +206,9 @@ class Worker(db.Model):
     
     parent_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable = True)
     sector_id = db.Column(db.Integer,db.ForeignKey('sector.id'), nullable = False)
-    parent = db.relationship('Tag', remote_side=[id])
+    parent = db.relationship('Worker', remote_side=[id])
     def __repr__(self):
-        return f"Worker('{self.database_import}','{self.read}','{self.comp}','{self.dist}','{self.data_posted}')"
+        return f"Worker('{self.name}','{self.surname}','{self.position}')"
 
 
 class Address(db.Model):
@@ -242,121 +233,4 @@ class City(db.Model):
     country = db.Column(db.String(70),nullable  = False)
     name = db.Column(db.String(70),nullable = False) 
     address_id = db.relationship('Address',backref = "Address")
-
-
-
-
-# db.create_all()
-
-
-# @app.route('/picture')
-# def picture():
-#     return send_file(path,mimetype = '/image')
-@app.route("/", methods =  ["POST", "GET"])
-def index():
-    if request.method == "POST":
-        return redirect (url_for("tasks"))
-    else:
-        return render_template('index.html')
-
-
-@app.route("/about")
-def about():
-    return render_template('error.html', title = "Ekran")
-
-@app.route("/products")
-def products():
-    return render_template('products.html',title = "Products")
-
-@app.route("/register",methods = ['GET','POST'])
-def register():
-    form = RegistrationForm()
-    if form.validate_on_submit():
-        flash(f'Account created for {form.username.data}!','success')
-        return redirect(url_for('index'))
-    return render_template('register.html',title = "Register",form = form)
-
-@app.route("/login")
-def login():
-    form = LoginForm()
-    return render_template('login.html',title = "Login",form = form)
-# @app.route("/tasks", methods=['POST', 'GET'])
-# def tasks():
-#     global switch, camera,res,res1
-#     if "printer" in session:
-#         printer = session["printer"]
-
-#         if request.method == 'POST':
-#             if request.form.get('click') == 'Capture':
-#                 global capture
-#                 capture = 1
-#                 sleep(0.05) ## uspanie, by zdazyl zrobic zdjecie
-#                 strg = strng.strg(session["printer"])
-#                 b = strg.ret()
-#                 # conn = connecting.connecting(b)
-#                 # a = conn.reading()
-#                 a = ['123131231','09 2022','1asda']
-
-#                 if a[0] == "Error":
-#                     return render_template('Error.html')
-#                 # obj = searchingNewest.searchingNewest()
-#                 # path = obj.searching()
-#                 # logger.info(path)
-#                 # OCR = processing.imageProcessing_gray(path,a)
-#                 # a,zeros,out,distance = OCR.run()
-#                 out = ["1","2","3"]
-#                 distance = ['1','2','3']
-#                 path = 'abcd'
-#                 l1=[]
-#                 list=[]
-#                 for iteration,x in enumerate(out):
-#                     r = new_list(a, out, distance, iteration)
-#                     l1.append(r)
-#                     ind = index(a, out,iteration)
-#                     list.append(ind)
-#                 # print(list)
-#                 # logging.info(list)
-#                 logger.info(l1)
-#                 for iteration, x in enumerate(l1):
-#                     record = Record(database_import = x[0],read = x[1],dist = x[2], comp = x[3])
-#                     db.session.add(record)
-#                 db.session.commit()
-#                 return render_template('Final.html',path = path,list = l1,index = list)
-
-
-#             elif request.form.get('stop') == 'Stop/Start':
-
-#                 if (switch == 1):
-#                     switch = 0
-#                     camera.release()
-#                     cv2.destroyAllWindows()
-
-#                 else:
-#                     camera = cv2.VideoCapture(0) # polaczenie po htppsie wysylanie obrazu
-#                     switch = 1
-
-#             elif request.form.get('res') == 'res':
-#                 global res
-#                 res = res - 1
-
-#             elif request.form.get('res1') == 'res1':
-#                 res = res + 1
-#             elif request.form.get('red') == 'red':
-#                 global red
-#                 red = not red
-#             elif request.form.get('black') == 'black':
-#                 global black
-#                 black = not black
-
-#             # elif request.form.get('back') == 'Wróć':
-#             #     return render_template('home.html',printers = printers)
-
-
-#         elif request.method == 'GET':
-#             return render_template('zamiennik.html', title="OCR", printer=printer)
-#         return render_template('zamiennik.html', title="OCR", printer=printer)
-
-
-if __name__ =='__main__':
-    app.run(debug=True)
 

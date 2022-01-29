@@ -1,6 +1,6 @@
 from base64 import decode
 from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
-from app.forms import RegistrationForm,LoginForm
+from app.forms import RegistrationForm,LoginForm,UpdateAccountForm
 from flask_sqlalchemy import SQLAlchemy
 from app.models import *
 from app import app,db,bcrypt
@@ -50,13 +50,14 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user and bcrypt.check_password_hash(user.password,form.password.data):
             login_user(user,remember = form.remember.data)
-            return redirect(url_for('index'))
+            next_page = request.args.get('next')
+            return redirect(next_page) if next_page else redirect(url_for('index'))
         else:
             flash('Login unsucesfull. Please check your username and password','danger')
     return render_template('login.html',title ="Login",form=form)
 
 
-@app.route("/logout",methods=['GET', 'POST'])
+@app.route("/logout")
 def logout():
     logout_user()
     return redirect(url_for('index'))
@@ -66,8 +67,25 @@ def logout():
 def cart():
     return render_template('cart.html',title = "Cart")
 
-@app.route("/account")
+@app.route("/account",methods=['GET', 'POST'])
 @login_required
 def account():
-    return render_template('account.html',title ="Account")
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        current_user.first_name = form.first_name.data
+        current_user.second_name = form.second_name.data
+        current_user.phone = form.phone.data
+        db.session.commit()
+        flash('Your account has been updated','success')
+        return redirect(url_for('account'))
+    elif request.method == "GET":
+        form.username.data =  current_user.username
+        form.email.data =  current_user.email
+        form.first_name.data =  current_user.first_name
+        form.second_name.data =  current_user.second_name
+        form.phone.data =  current_user.phone
+        
+    return render_template('account.html',title ="Account",form = form)
 

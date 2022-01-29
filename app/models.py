@@ -33,11 +33,11 @@ class Product(db.Model):
     favourite = db.relationship("User",secondary = product_is_favourite)
     comments = db.relationship("Comment",backref = "Comment")
     has_cart = db.relationship("Cart",secondary = product_has_cart)
-    brand_id = db.Column(db.Integer,db.ForeignKey('brand.id'),nullable = False)
-    type_id = db.Column(db.Integer,db.ForeignKey('product_type.id'),nullable = False)
+    brand_id = db.Column(db.Integer,db.ForeignKey('brand.id'),nullable = True) ## sprawdz te nulle
+    type_id = db.Column(db.Integer,db.ForeignKey('product_type.id'),nullable = True)
     has_order = db.relationship("Order", secondary = product_has_order)
-    sectors = db.Column(db.Integer,db.ForeignKey('sector.id'),nullable = False)
-    warehouses = db.Column(db.Integer,db.ForeignKey('warehouse.id'),nullable = False)
+    sectors = db.Column(db.Integer,db.ForeignKey('sector.id'),nullable = True)
+    warehouses = db.Column(db.Integer,db.ForeignKey('warehouse.id'),nullable = True)
 
     
     def __repr__(self):
@@ -155,7 +155,7 @@ class User(db.Model,UserMixin): #1
 
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'),unique = True)
     # cart = db.relationship("Cart",backref=backref("User", uselist=False))
-    cart = db.relationship("Cart",back_populates = "User")
+    cart = db.relationship("Cart",back_populates = "User")  
     # cart = db.relationship("Cart",uselist = False,backref = "user")
 
     

@@ -3,5 +3,13 @@
 {%endblock%}
 {% block body %}
   <h1 class = "header"> Twój koszyk </h1>
-  
+  {% for items in cart %}
+  <tr>
+    <p class="text-secondary"> Name: {{items.id}} </p>
+   
+  </tr>
+ 
+
+
+{% endfor %}
 {% endblock %}

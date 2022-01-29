@@ -3,18 +3,26 @@
 {%endblock%}
 {% block body %}
   <h1 class = "header"> Produkty </h1>
-  
-  <div class = "taskbar">
-    <form action = "#" method = "post">
-  
+  <div class="ind">
+  <form method="post" action="/products">
+    <input type="submit" class ="submit" value="Haczyki" name="Haczyki"  />
+    <input type="submit" class ="submit" value="Wedki" name="Wedki" />
+    <input type="submit" class ="submit" value="Reszta" name="Reszta" />  
     </form>
-    </div>
-    <div class ="Instrukcja">
-      <ol>
-        <li>Wybierz drukarke z której drukowana była etykieta.</li>
-        <li>Wciśnij przycisk "Potwierdź". </li>
-        <li> W razie pomyłki użyj przycisku "Wróć".</li>
-        <li>Przybliż obiektyw i wykonaj zdjęcie tak, by na ekranie był tylko sprawdzany tekst.</li>
-      </ol>
-    </div>
+  </div>
+  <br></br>
+  {% for result in products %}
+    <tr>
+      <p class="text-secondary"> Name: {{result.name}} Price: {{result.price}} Quantity: {{result.quantity}}ID: {{result.id}} </p>
+     
+    </tr>
+    <form method = "post" action ="/add_to_cart">
+      <input type="hidden" name="hidden"  value={{result.id}}>
+      <input type="submit" class ="Cart" value ="Add to cart"  name = "Add to cart" >
+      
+    </form>
+    <a href = "{{url_for('like')}}" title="Add to fav"> Like  </i> </a>
+
+
+{% endfor %}
 {% endblock %}

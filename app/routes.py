@@ -194,8 +194,14 @@ def order():
         adress = Address(street = form.street.data,house_nr=form.number.data,postal_code=form.postal_code.data,city_id=city.id)
         db.session.add(adress)
         db.session.commit()
-        order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id =adress.id)
+        order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id = adress.id)      
         db.session.add(order)
+        for products_update in cart_product:
+            p = products_update.id
+            product = Product.query.filter_by(id = p).first()
+            product.has_order.append(order)
+            db.session.commit()
+
         for i,clear in enumerate(cart_product):
             cart_product[i].has_cart.clear()
 

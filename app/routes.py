@@ -26,19 +26,19 @@ def about():
 @app.route("/products", methods=['POST', 'GET'])
 def products():
     if request.method =="POST":
-        if request.form.get('Haczyki') == 'Haczyki':
-            products = Product.query.filter(Product.type_id == 1).all()
-            return render_template('products.html',title = "Products",products = products)
-        if request.form.get('Wedki') == 'Wedki':
-            products = Product.query.filter(Product.type_id == 2 ).all()
-            return render_template('products.html',title = "Products",products = products)
+        product_type_title = request.form.get('product_type')
+        if product_type_title == "Wszystkie":
+            products = Product.query.order_by(Product.id).all()
+        else:
+            product_type = Product_type.query.filter(Product_type.title == request.form.get('product_type')).one()
+            products = Product.query.filter(Product.type_id == product_type.id).all()
 
-        if request.form.get('Reszta') == 'Reszta':
-            products = Product.query.filter(Product.type_id == 3 ).all()
-            return render_template('products.html',title = "Products",products = products)
+        product_types = Product_type.query.order_by(Product_type.id).all()
+        return render_template('products.html',title = "Products",products = products, product_types=product_types)
     if request.method =="GET":
         products = Product.query.order_by(Product.id).all()
-        return render_template('products.html',title = "Products",products = products)
+        product_types = Product_type.query.order_by(Product_type.id).all()
+        return render_template('products.html',title = "Products",products = products, product_types = product_types)
 
 @app.route("/register",methods = ['GET','POST'])
 def register():

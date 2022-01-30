@@ -18,7 +18,7 @@ insert_user(username="user3", email="user3@email.com", password="qwerty123", fir
             second_name="Krajewski", phone=998)
 
 insert_user_with_all_attributes(username="user4", email="user4@email.com", password="qwerty123", first_name="Tom",
-                                second_name="Cruise", phone=1234111, city_name="Warszawa", street="Bazodanowa",
+                                second_name="Cruise", phone=1234111, city_name="Puławy", street="Bazodanowa",
                                 house_nr=2, postal_code="01-234")
 
 # product types

@@ -1,28 +1,29 @@
-{%extends 'base.html' %}
+{% extends 'base.html' %}
 {% block head %}
-{%endblock%}
+{% endblock %}
 {% block body %}
-  <h1 class = "header"> Produkty </h1>
-  <div class="ind">
-  <form method="post" action="/products">
-    <input type="submit" class ="submit" value="Haczyki" name="Haczyki"  />
-    <input type="submit" class ="submit" value="Wedki" name="Wedki" />
-    <input type="submit" class ="submit" value="Reszta" name="Reszta" />  
-    </form>
-  </div>
-  <br></br>
-  {% for result in products %}
-    <tr>
-      <p class="text-secondary"> Name: {{result.name}} Price: {{result.price}} Quantity: {{result.quantity}}ID: {{result.id}} </p>
-     
-    </tr>
-    <form method = "post" action ="/add_to_cart">
-      <input type="hidden" name="hidden"  value={{result.id}}>
-      <input type="submit" class ="Cart" value ="Add to cart"  name = "Add to cart" >
-      
-    </form>
-    <a href = "{{url_for('like')}}" title="Add to fav"> Like  </i> </a>
+    <h1 class="header"> Produkty </h1>
+    <div class="ind">
+        <form method="post" action="/products">
+            {% for product_type in product_types %}
+                <input type="submit" class="submit" value={{ product_type.title }} name="product_type"/>
+            {% endfor %}
+            <input type="submit" class="submit" value="Wszystkie" name="product_type"/>
+        </form>
+    </div>
+    <br></br>
+    {% for result in products %}
+        <tr>
+            <p class="text-secondary"><a href="/products/{{ result.id }}"> Name: {{ result.name }}
+                Price: {{ result.price }} Quantity: {{ result.quantity }}ID: {{ result.id }} </a></p>
 
+        </tr>
+        <form method="post" action="/add_to_cart">
+            <input type="hidden" name="hidden" value={{ result.id }}>
+            <input type="submit" class="Cart" value="Add to cart" name="Add to cart">
 
-{% endfor %}
+        </form>
+        <a href="{{ url_for('like') }}" title="Add to fav"> Like  </i> </a>
+
+    {% endfor %}
 {% endblock %}

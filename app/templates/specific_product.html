@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='product.css') }}">
+{% block head %}
+{% endblock %}
+{% block body %}
+    <div>
+        <form method="post" action="/products">
+            <input type="submit" class="btn-link" value="Wszystkie" name="product_type"/>->
+            <input type="submit" class="btn-link" value={{ product_type }} name="product_type"/>
+        </form>
+    </div>
+
+    <div id="wrapper">
+        <div id="div1">
+            <img class="product_img" src="{{ url_for('static', filename=product.photo) }}"/></div>
+        <div id="div2" class="product-description">
+            <h1> {{ product.name }} </h1>
+            <h2> {{ product.price }} zł </h2>
+            <p></p>
+            <p> {{ product.description }} </p>
+            <br>
+            <form method="post" action="/add_to_cart">
+                <input type="hidden" name="hidden" value={{ product.id }}>
+                <input type="submit" class=button2 value="Add to cart" name="Add to cart">
+            </form>
+        </div>
+    </div>
+    <button class=button2 onclick="history.back()">Powrót</button>
+{% endblock %}

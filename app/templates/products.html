@@ -7,8 +7,6 @@
   <form method="post" action="/products">
       {% for product_type in product_types %}
         <input type="submit" class ="submit" value={{product_type.title}} name="product_type"  />
-        <!--<input type="submit" class ="submit" value="Wedki" name="Wedki" />
-        <input type="submit" class ="submit" value="Reszta" name="Reszta" />-->
       {% endfor %}
         <input type="submit" class ="submit" value="Wszystkie" name="product_type"  />
     </form>

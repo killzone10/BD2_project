@@ -23,9 +23,10 @@ def index():
 def about():
     return render_template('error.html', title = "Ekran")
 
+
 @app.route("/products", methods=['POST', 'GET'])
 def products():
-    if request.method =="POST":
+    if request.method == "POST":
         product_type_title = request.form.get('product_type')
         if product_type_title == "Wszystkie":
             products = Product.query.order_by(Product.id).all()
@@ -34,11 +35,11 @@ def products():
             products = Product.query.filter(Product.type_id == product_type.id).all()
 
         product_types = Product_type.query.order_by(Product_type.id).all()
-        return render_template('products.html',title = "Products",products = products, product_types=product_types)
-    if request.method =="GET":
+        return render_template('products.html', title="Products", products=products, product_types=product_types)
+    if request.method == "GET":
         products = Product.query.order_by(Product.id).all()
         product_types = Product_type.query.order_by(Product_type.id).all()
-        return render_template('products.html',title = "Products",products = products, product_types = product_types)
+        return render_template('products.html', title="Products", products=products, product_types=product_types)
 
 @app.route("/register",methods = ['GET','POST'])
 def register():

@@ -1,20 +1,25 @@
 from base64 import decode
+from threading import currentThread
 from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
-from app.forms import RegistrationForm,LoginForm,UpdateAccountForm
+from numpy import product
+from app.forms import RegistrationForm,LoginForm,UpdateAccountForm,OrderForm
 from flask_sqlalchemy import SQLAlchemy
 from app.models import *
 from app import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
+from datetime import datetime,date
 
 @app.route("/", methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
         if request.form.get('Log') == 'Log in':
-            return redirect(url_for('login'))
+            return redirect(url_for('login'))   
         elif request.form.get('Sign') == 'Sign in':
             return redirect(url_for('register'))
         elif request.form.get('Products') == 'Products':
             return redirect(url_for('products'))
+        elif request.form.get('Cart') == 'Cart':
+            return redirect(url_for('cart'))
     elif request.method == 'GET':
         return render_template('index.html')
 
@@ -22,9 +27,22 @@ def index():
 def about():
     return render_template('error.html', title = "Ekran")
 
-@app.route("/products")
+@app.route("/products", methods=['POST', 'GET'])
 def products():
-    return render_template('products.html',title = "Products")
+    if request.method =="POST":
+        if request.form.get('Haczyki') == 'Haczyki':
+            products = Product.query.filter(Product.type_id == 1).all()
+            return render_template('products.html',title = "Products",products = products)
+        if request.form.get('Wedki') == 'Wedki':
+            products = Product.query.filter(Product.type_id == 2 ).all()
+            return render_template('products.html',title = "Products",products = products)
+
+        if request.form.get('Reszta') == 'Reszta':
+            products = Product.query.filter(Product.type_id == 3 ).all()
+            return render_template('products.html',title = "Products",products = products)
+    if request.method =="GET":
+        products = Product.query.order_by(Product.id).all()
+        return render_template('products.html',title = "Products",products = products)
 
 @app.route("/register",methods = ['GET','POST'])
 def register():
@@ -33,8 +51,11 @@ def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         hashed_password=bcrypt.generate_password_hash(form.password.data).decode('utf-8')
+        cart = Cart()
+        db.session.add(cart)
+        db.session.commit()
         user = User(username=form.username.data
-       ,email = form.email.data, password = hashed_password)
+       ,email = form.email.data, password = hashed_password,cart_id = cart.id)
         db.session.add(user)
         db.session.commit()
         flash(f'Your account have been created, you can log in!','success')
@@ -62,10 +83,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route("/cart",methods=['GET', 'POST'])
-@login_required
-def cart():
-    return render_template('cart.html',title = "Cart")
 
 @app.route("/account",methods=['GET', 'POST'])
 @login_required
@@ -88,4 +105,121 @@ def account():
         form.phone.data =  current_user.phone
         
     return render_template('account.html',title ="Account",form = form)
+
+
+@app.route("/delete",methods=['GET', 'POST'])
+@login_required
+def delete():
+    if request.method =="POST":
+        if request.form.get('Delete') == 'Delete':
+            user = User.query.filter_by(username =current_user.username).delete()
+            db.session.commit()
+            flash('Your account has been deleted','danger')
+            return redirect(url_for('logout'))
+    elif request.method =="GET":
+        return render_template("delete.html")
+
+
+@app.route("/add_to_cart",methods =['GET','POST'])
+@login_required
+def add_to_cart():
+    if request.method =="POST":
+        if request.form.get("Add to cart") == "Add to cart":
+            product_id = request.form.get("hidden")
+            cart_id = current_user.cart_id
+            product_update = Product.query.filter(Product.id == product_id).all()
+            query_cart = Cart.query.filter(Cart.id == cart_id).all()
+            product_update[0].has_cart.append(query_cart[0])
+            db.session.commit()
+            flash(f'Product has been added to cart!','success')
+    return redirect(url_for('products')) 
+
+@app.route("/cart",methods=['GET', 'POST'])
+@login_required
+def cart():
+
+    if request.method =="GET":
+        cart_id = current_user.cart_id
+        # products_id = Product.query.filter(Product.has_cart == cart_id).all()
+        # print(db.session.query(product_has_cart).join(Product).join(Cart).filter(Product.has_cart == cart_id))
+        # print((product_has_cart.c.cart_id))
+        total_price = 0
+        cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+        for price in cart_product:
+            total_price = total_price + price.price
+        # print(cart_product)
+        # print(product_has_cart.cart.id)
+        # print(current_user.cart)
+        # print(current_user.cart_id)
+        # query_cart = Cart.query.join(product_has_cart).filter((product_has_cart.cart_id == Cart.id))
+        # result = db.session.query(Cart.id,Product.name).filter(product_has_cart.c.cart_id == Cart.id))
+        # print(cart_product)
+        # Product.query.join(product_has_cart).filter(Product.cart.id == cart_id)
+        # print("sesja:", db.session.query(product_has_cart).filter(product_has_cart.cart.id==1))
+        # cart = Cart.query.filter(Cart.id == id).all()
+        return render_template('cart.html',title = "Cart", cart=cart_product,total_price=total_price)
+    elif request.method =="POST":
+        if request.form.get("Remove") == "Remove":
+            product_id = request.form.get("hidden")
+            print(product_id)
+            cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
+            print(cart_product)
+            # cart_product[int(product_id)].clear()
+            cart_product[0].has_cart.clear()
+            db.session.commit()
+            flash(f'Product has been deleted from cart!','success')
+            return redirect(url_for('cart')) 
+        if request.form.get('Buy') == 'Buy':
+           
+            return redirect(url_for('order'))
+
+@app.route("/like",methods =['GET','POST'])
+@login_required
+def like():
+    return render_template("cart.html")
+
+@app.route("/order",methods =['GET','POST'])
+@login_required
+def order():
+    cart_id = current_user.cart_id
+    total_price = 0
+    cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+    for price in cart_product:
+        total_price = total_price + price.price
+    form = OrderForm()
+    if form.validate_on_submit():
+        city = City(country = form.country.data,name = form.city.data)
+        db.session.add(city)
+        db.session.commit()
+        adress = Address(street = form.street.data,house_nr=form.number.data,postal_code=form.postal_code.data,city_id=city.id)
+        db.session.add(adress)
+        db.session.commit()
+        order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id = adress.id)      
+        db.session.add(order)
+        for products_update in cart_product:
+            p = products_update.id
+            product = Product.query.filter_by(id = p).first()
+            product.has_order.append(order)
+            db.session.commit()
+
+        for i,clear in enumerate(cart_product):
+            cart_product[i].has_cart.clear()
+
+        db.session.commit()
+        # db.session.commit()
+        flash('Sucesfully created order','success')
+        return redirect(url_for('index'))
+    elif request.method == "GET":
+        form.email.data = current_user.email
+        form.first_name.data = current_user.first_name
+        form.second_name.data = current_user.second_name
+        form.phone.data =  current_user.phone
+        form.country.data = "Poland"
+        form.city.data = "Warszawa"
+        
+
+
+    return render_template("order.html",form=form,total_price = total_price)
+
+
 

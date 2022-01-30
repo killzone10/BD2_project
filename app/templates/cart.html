@@ -2,6 +2,26 @@
 {% block head %}
 {%endblock%}
 {% block body %}
+{% set price = 0 %}
   <h1 class = "header"> Twój koszyk </h1>
-  
+  {% for item in cart %}
+  <tr>
+    <p class="text-secondary"> Id: {{item.id}} Name: {{item.name}} Price: {{item.price}} </p>
+    <form method = "post" action ="/cart">
+      <input type="hidden" name="hidden"  value={{item.id}}>
+      <input type="submit" class ="Cart" value ="Remove"  name = "Remove" >
+      
+    </form>
+  </tr>
+<div class = "final">
+</div>
+<p > 
+
+{% endfor %}
+<div class = "finalize">
+  <p> Total price is : {{total_price}}</p> 
+    <form method="post" action="/cart">
+      <input type="submit" class ="submit" value="Buy" name="Buy" />
+    </form>
+</div>
 {% endblock %}

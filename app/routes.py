@@ -1,6 +1,7 @@
 from base64 import decode
 from threading import currentThread
 from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
+from numpy import product
 from app.forms import RegistrationForm,LoginForm,UpdateAccountForm
 from flask_sqlalchemy import SQLAlchemy
 from app.models import *
@@ -11,11 +12,13 @@ from flask_login import login_user,current_user,logout_user,login_required
 def index():
     if request.method == 'POST':
         if request.form.get('Log') == 'Log in':
-            return redirect(url_for('login'))
+            return redirect(url_for('login'))   
         elif request.form.get('Sign') == 'Sign in':
             return redirect(url_for('register'))
         elif request.form.get('Products') == 'Products':
             return redirect(url_for('products'))
+        elif request.form.get('Cart') == 'Cart':
+            return redirect(url_for('cart'))
     elif request.method == 'GET':
         return render_template('index.html')
 
@@ -79,12 +82,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.route("/cart",methods=['GET', 'POST'])
-@login_required
-def cart():
-    id = current_user.cart_id
-    cart = Cart.query.filter(Cart.id == id).all()
-    return render_template('cart.html',title = "Cart", cart=cart)
 
 @app.route("/account",methods=['GET', 'POST'])
 @login_required
@@ -129,13 +126,50 @@ def add_to_cart():
         if request.form.get("Add to cart") == "Add to cart":
             product_id = request.form.get("hidden")
             cart_id = current_user.cart_id
-            print(cart_id)
             product_update = Product.query.filter(Product.id == product_id).all()
             query_cart = Cart.query.filter(Cart.id == cart_id).all()
             product_update[0].has_cart.append(query_cart[0])
             db.session.commit()
             flash(f'Product has been added to cart!','success')
     return redirect(url_for('products')) 
+
+@app.route("/cart",methods=['GET', 'POST'])
+@login_required
+def cart():
+
+    if request.method =="GET":
+        cart_id = current_user.cart_id
+        # products_id = Product.query.filter(Product.has_cart == cart_id).all()
+        # print(db.session.query(product_has_cart).join(Product).join(Cart).filter(Product.has_cart == cart_id))
+        # print((product_has_cart.c.cart_id))
+        total_price = 0
+        cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+        for price in cart_product:
+            total_price = total_price + price.price
+        # print(cart_product)
+        # print(product_has_cart.cart.id)
+        # print(current_user.cart)
+        # print(current_user.cart_id)
+        # query_cart = Cart.query.join(product_has_cart).filter((product_has_cart.cart_id == Cart.id))
+        # result = db.session.query(Cart.id,Product.name).filter(product_has_cart.c.cart_id == Cart.id))
+        # print(cart_product)
+        # Product.query.join(product_has_cart).filter(Product.cart.id == cart_id)
+        # print("sesja:", db.session.query(product_has_cart).filter(product_has_cart.cart.id==1))
+        # cart = Cart.query.filter(Cart.id == id).all()
+        return render_template('cart.html',title = "Cart", cart=cart_product,total_price=total_price)
+    elif request.method =="POST":
+        if request.form.get("Remove") == "Remove":
+            product_id = request.form.get("hidden")
+            print(product_id)
+            cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
+            print(cart_product)
+            # cart_product[int(product_id)].clear()
+            cart_product[0].has_cart.clear()
+            db.session.commit()
+            flash(f'Product has been deleted from cart!','success')
+            return redirect(url_for('cart')) 
+
+
 
 @app.route("/like",methods =['GET','POST'])
 def like():

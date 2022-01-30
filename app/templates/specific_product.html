@@ -3,21 +3,12 @@
 {% block head %}
 {% endblock %}
 {% block body %}
-    <div class="ind">
+    <div>
         <form method="post" action="/products">
-            <input type="submit" class="submit" value={{ product_type }} name="product_type"/>
-            <input type="submit" class="submit" value="Wszystkie" name="product_type"/>
+            <input type="submit" class="btn-link" value="Wszystkie" name="product_type"/>->
+            <input type="submit" class="btn-link" value={{ product_type }} name="product_type"/>
         </form>
     </div>
-
-    <div class="left-column">
-        <br></br>
-        <tr>
-            <p class="text-secondary"> Name: {{ product.name }} Price: {{ product.price }}
-                Quantity: {{ product.quantity }}ID: {{ product.id }} </p>
-        </tr>
-    </div>
-
 
     <div id="wrapper">
         <div id="div1">

@@ -282,3 +282,15 @@ text-align: center;
   color: #575f69;
   line-height: 24px;
 }
+
+.btn-link {
+    border: none;
+    outline: none;
+    background: none;
+    cursor: pointer;
+    color: #727272;
+    padding: 0;
+    text-decoration: underline;
+    font-family: inherit;
+    font-size: inherit;
+}

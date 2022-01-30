@@ -244,6 +244,7 @@ text-align: center;
     margin: auto;
     left: 0;
     right: 0;
+    padding-bottom: 25px;
 }
 #div1 {
     display: inline-block;
@@ -293,4 +294,33 @@ text-align: center;
     text-decoration: underline;
     font-family: inherit;
     font-size: inherit;
+}
+
+.button2 {
+    display: inline-block;
+    padding: 0.5em 3em;
+    border: 0.16em solid #FFFFFF;
+    margin: 0 0.3em 0.3em 0;
+    box-sizing: border-box;
+    text-decoration: none;
+    /*ext-transform: uppercase;*/
+    font-family: 'Roboto', sans-serif;
+    font-weight: 400;
+    color: #FFFFFF;
+    text-align: center;
+    transition: all 0.15s;
+    background: #3184fd;
+    border-radius: 15px;
+}
+
+.button2:hover {
+    color: white;
+    border-color: #cef6ff;
+    background: #4d95ff;
+}
+
+.button2:active {
+    color: white;
+    border-color: #cef6ff;
+    background: #4d95ff;
 }

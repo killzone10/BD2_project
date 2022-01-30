@@ -1,7 +1,8 @@
 from flask_wtf import FlaskForm
 from flask_login import current_user
 from flask_wtf.file import FileField,FileAllowed
-from wtforms import StringField,PasswordField,SubmitField,BooleanField,TelField
+from pyparsing import countedArray
+from wtforms import StringField,PasswordField,SubmitField,BooleanField,TelField,IntegerField
 from wtforms.validators import DataRequired,Length,Email,EqualTo,ValidationError
 from app.models import User,Invoice,Order
 
@@ -77,3 +78,33 @@ class UpdateAccountForm(FlaskForm):
     #         if user: #will be None if not in database
     #             raise ValidationError('Email already exist - choose different email')
 
+class OrderForm(FlaskForm):
+
+    email = StringField('Email',
+                            validators=[DataRequired(),Email()])
+   
+    first_name = StringField('First name',
+                            validators=[DataRequired(),Length(min = 2, max = 20)])
+
+    second_name = StringField('Second name',
+                            validators=[DataRequired(),Length(min = 2, max = 20)])
+
+    phone = TelField('Phone',validators=[DataRequired(),Length(min = 2, max = 10)])
+
+
+    country = StringField('Country',
+                            validators=[DataRequired(),Length(min = 2,max = 40)])
+
+    city = StringField('City',
+                            validators=[DataRequired(),Length(min = 2,max = 40)])
+
+
+    street = StringField('Street',
+                            validators=[DataRequired(),Length(min = 2,max = 40)])
+
+    number = TelField('Number',validators=[DataRequired(),Length(min = 2, max = 10)])
+
+    postal_code = StringField('Postal-Code  ',validators=[DataRequired(),Length(min = 2, max = 10)])
+   
+   
+    submit = SubmitField('Buy')

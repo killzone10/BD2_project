@@ -8,18 +8,18 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import backref
 
 product_is_favourite = db.Table('product_is_favourite', db.Model.metadata,
-    db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
-    db.Column('user.id', db.Integer,db.ForeignKey('user.id'))
+    db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
+    db.Column('user_id', db.Integer,db.ForeignKey('user.id'))
     )
 
 product_has_cart = db.Table('product_has_cart', db.Model.metadata,
-    db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
-    db.Column('cart.id', db.Integer,db.ForeignKey('cart.id'))
+    db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
+    db.Column('cart_id', db.Integer,db.ForeignKey('cart.id'))
     )
 
 product_has_order = db.Table('product_has_order', db.Model.metadata,
-    db.Column('product.id', db.Integer,db.ForeignKey('product.id')),
-    db.Column('order.id', db.Integer,db.ForeignKey('order.id'))
+    db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
+    db.Column('order_id', db.Integer,db.ForeignKey('order.id'))
     )
 class Product(db.Model):
     __tablename__ ="product"

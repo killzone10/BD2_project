@@ -296,6 +296,13 @@ text-align: center;
     font-size: inherit;
 }
 
+.finalize{
+
+  position: relative;
+  bottom:15%;
+  left:90%;
+
+}
 .button2 {
     display: inline-block;
     padding: 0.5em 3em;

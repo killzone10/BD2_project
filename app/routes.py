@@ -2,11 +2,12 @@ from base64 import decode
 from threading import currentThread
 from flask import Flask, render_template,url_for,request,redirect,Response,session,send_file,flash
 from numpy import product
-from app.forms import RegistrationForm,LoginForm,UpdateAccountForm
+from app.forms import RegistrationForm,LoginForm,UpdateAccountForm,OrderForm
 from flask_sqlalchemy import SQLAlchemy
 from app.models import *
 from app import app,db,bcrypt
 from flask_login import login_user,current_user,logout_user,login_required
+from datetime import datetime,date
 
 @app.route("/", methods=['POST', 'GET'])
 def index():
@@ -168,9 +169,51 @@ def cart():
             db.session.commit()
             flash(f'Product has been deleted from cart!','success')
             return redirect(url_for('cart')) 
-
-
+        if request.form.get('Buy') == 'Buy':
+           
+            return redirect(url_for('order'))
 
 @app.route("/like",methods =['GET','POST'])
+@login_required
 def like():
     return render_template("cart.html")
+
+@app.route("/order",methods =['GET','POST'])
+@login_required
+def order():
+    cart_id = current_user.cart_id
+    total_price = 0
+    cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+    for price in cart_product:
+        total_price = total_price + price.price
+    form = OrderForm()
+    if form.validate_on_submit():
+        city = City(country = form.country.data,name = form.city.data)
+        db.session.add(city)
+        db.session.commit()
+        adress = Address(street = form.street.data,house_nr=form.number.data,postal_code=form.postal_code.data,city_id=city.id)
+        db.session.add(adress)
+        db.session.commit()
+        order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id =adress.id)
+        db.session.add(order)
+        for i,clear in enumerate(cart_product):
+            cart_product[i].has_cart.clear()
+
+        db.session.commit()
+        # db.session.commit()
+        flash('Sucesfully created order','success')
+        return redirect(url_for('index'))
+    elif request.method == "GET":
+        form.email.data = current_user.email
+        form.first_name.data = current_user.first_name
+        form.second_name.data = current_user.second_name
+        form.phone.data =  current_user.phone
+        form.country.data = "Poland"
+        form.city.data = "Warszawa"
+        
+
+
+    return render_template("order.html",form=form,total_price = total_price)
+
+
+

@@ -13,18 +13,6 @@
     </div>
     <br></br>
     {% for result in products %}
-        {#        <tr>#}
-        {#            <p class="text-secondary"><a href="/products/{{ result.id }}"> Name: {{ result.name }}#}
-        {#                Price: {{ result.price }} Quantity: {{ result.quantity }}ID: {{ result.id }} </a></p>#}
-        {##}
-        {#        </tr>#}
-        {#        <form method="post" action="/add_to_cart">#}
-        {#            <input type="hidden" name="hidden" value={{ result.id }}>#}
-        {#            <input type="submit" class="Cart" value="Add to cart" name="Add to cart">#}
-        {##}
-        {#        </form>#}
-        {#        <a href="{{ url_for('like') }}" title="Add to fav"> Like  </i> </a>#}
-
         <a href="/products/{{ result.id }}" style="text-decoration: none">
             <div id="tab-wrapper">
 

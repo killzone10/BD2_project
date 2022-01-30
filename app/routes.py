@@ -41,6 +41,14 @@ def products():
         product_types = Product_type.query.order_by(Product_type.id).all()
         return render_template('products.html', title="Products", products=products, product_types=product_types)
 
+@app.route("/products/<int:product_id>", methods=['POST', 'GET'])
+def specific_product(product_id):
+    if request.method == "GET":
+
+        product = Product.query.filter(Product.id == product_id).one()
+        product_type = Product_type.query.filter(Product_type.id == product.type_id).one()
+        return render_template('specific_product.html', title="Products", product=product, product_type=product_type.title)
+
 @app.route("/register",methods = ['GET','POST'])
 def register():
     if current_user.is_authenticated:

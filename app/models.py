@@ -24,6 +24,7 @@ product_has_order = db.Table('product_has_order', db.Model.metadata,
 class Product(db.Model):
     __tablename__ ="product"
     id = db.Column(db.Integer,primary_key = True)
+    photo = db.Column(db.String(40))
     name = db.Column(db.String(40))
     price = db.Column(db.Float)
     quantity = db.Column(db.Integer)

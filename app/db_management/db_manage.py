@@ -46,8 +46,8 @@ def insert_product_type(title, parent_id=None):
     return product_type
 
 
-def insert_product(name, price, quantity, description, type_id, brand_id=None):
-    product = Product(name=name, price=price, quantity=quantity, description=description,
+def insert_product(name, photo, price, quantity, description, type_id, brand_id=None):
+    product = Product(name=name, photo=photo, price=price, quantity=quantity, description=description,
                       type_id=type_id, brand_id=brand_id)
     db.session.add(product)
     db.session.commit()

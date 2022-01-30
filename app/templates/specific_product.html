@@ -18,6 +18,11 @@
             <h2> {{ product.price }} zł </h2>
             <p></p>
             <p> {{ product.description }} </p>
+            <br>
+            <form method="post" action="/add_to_cart">
+                <input type="hidden" name="hidden" value={{ product.id }}>
+                <input type="submit" class=button2 value="Add to cart" name="Add to cart">
+            </form>
         </div>
     </div>
     <button class=button2 onclick="history.back()">Powrót</button>

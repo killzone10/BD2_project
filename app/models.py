@@ -50,16 +50,11 @@ class Order(db.Model):
     id = db.Column(db.Integer, primary_key = True)
     date = db.Column(db.DateTime, nullable = False)
     status = db.Column(db.Integer, nullable = False)
-        # first_name = db.Column(db.String(15), nullable = False)
-        # second_name = db.Column(db.String(15), nullable = False)
-        # address = db.Column(db.String(15), nullable = False)
-        # email = db.Column(db.String(20), nullable = False)
-        # postal_code = db.Column(db.String(20), nullable = False)
     total_price = db.Column(db.Float, nullable = False)
     adress_id = db.Column(db.Integer,db.ForeignKey("address.id"))
     address = relationship("Address")
     # phone = db.Column(db.Integer, nullable = True)
-    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False)
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = True)
     def __repr__(self):
         return f"Order('{self.date}','{self.total_price}','{self.adress_id}')"
 
@@ -67,13 +62,9 @@ class Order(db.Model):
 class Invoice(db.Model):
     __tablename__="invoice"
     id = db.Column(db.Integer, primary_key = True)
-    # first_name = db.Column(db.String(15), nullable = False)
-    # second_name = db.Column(db.String(15), nullable = False)
-    # address = db.Column(db.String(15), nullable = False)
     data = db.Column(db.DateTime, nullable = False, default = datetime.datetime.now())
     seller = db.Column(db.String(15), nullable = False)
     identification_number = db.Column(db.Integer)
-    # order_id = db.relationship("Order",backref=backref("Order", uselist=False))
     order_id = db.Column(db.Integer,db.ForeignKey('order.id'),nullable = False, unique = True)
 
     def __repr__(self):
@@ -86,7 +77,6 @@ class Brand(db.Model):
     __tablename__="brand"
     id = db.Column(db.Integer,primary_key = True)
     name = db.Column(db.String(25),nullable = False)
-    # product_id = db.relationship('Product',backref = "Produkt")
     def __repr__(self):
         return f"Brand('{self.id}','{self.description}','{self.product_id}')"
 
@@ -95,8 +85,6 @@ class Product_type(db.Model):
     __tablename__="product_type"
     id = db.Column(db.Integer, primary_key = True)
     title = db.Column(db.String(45), nullable = False)
-    # product_id = db.relationship('Product',backref = "Product_id")
-    # parent = db.relationship('Product_type', remote_side=[id])
     parent_id = db.Column(db.Integer, db.ForeignKey('product_type.id'), nullable = True)
 
 
@@ -104,8 +92,7 @@ class Cart(db.Model):
      __tablename__ ="cart"
      id = db.Column(db.Integer,primary_key = True)
      User = relationship("User",back_populates="cart",uselist = False)
-    #  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    #  user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
+
 
 
 
@@ -142,22 +129,14 @@ class User(db.Model,UserMixin): #1
     first_name = db.Column(db.String(40),nullable=True)
     second_name = db.Column(db.String(40),nullable=True)
     phone = db.Column(db.Integer)
-    # postal_code = db.Column(db.Integer)
-
-    # product_fav_id = db.Column(db.Integer,db.ForeignKey   ('product.id'), nullable = False) 
     comments = db.relationship('Comment',backref = 'author', lazy = True) # backref dodajemy kolumne do Comment lazy true sql alchemy load TRUE asap
-    # roles = db.relationship('User_role',backref = 'User_role',lazy = True) DOKONCZ RELACJE wiele do wielu
     roles = db.relationship("Role",secondary = user_role)
     orders = db.relationship('Order',backref = 'Order', lazy = True) # backref dodajemy kolumne do Comment lazy true sql alchemy load TRUE asap
 
 
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'),unique = True)
-    # cart = db.relationship("Cart",backref=backref("User", uselist=False))
     cart = db.relationship("Cart",back_populates = "User")
     address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
-    # cart = db.relationship("Cart",uselist = False,backref = "user")
-
-
 
 
     def __repr__(self): # wyspeciikujemy klase z relacja
@@ -174,13 +153,10 @@ class Warehouse(db.Model):
     __tablename__ ="warehouse"
     id = db.Column(db.Integer, primary_key = True)
     max_capacity = db.Column(db.Integer, nullable=False)
-    # address = db.Column(db.String(30), nullable=False)
-    # postal_code = db.Column(db.String(6), nullable=False)#!!! miasto z postal code zrobic jako oddzielna encje w 3PN
     product_id = db.relationship('Product',backref = "Product")
     sectors = db.relationship('Sector', backref = 'Warehouse')
 
     address_id = db.Column(db.Integer,db.ForeignKey('address.id'))
-    # address = relationship("Address",backref = backref("Warehouse",uselist = False))
     def __repr__(self):
         return f"Warehouse('{self.max_capacity}','{self.id}')"
 
@@ -213,12 +189,9 @@ class Worker(db.Model):
 class Address(db.Model):
     __tablename__ = "address"
     id = db.Column(db.Integer, primary_key=True)
-    # country = db.Column(db.String(70),nullable  = False)
-    # city = db.Column(db.String(70),nullable = False)
     street = db.Column(db.String(70), nullable=True)
     house_nr = db.Column(db.Integer, nullable=False)
     postal_code = db.Column(db.String(15), nullable=False)
-    # postal_code = db.Column(db.String(15), nullable = False)
     city_id = db.Column(db.Integer, db.ForeignKey('city.id'), nullable=False)
 
     # city relationship
@@ -227,6 +200,5 @@ class Address(db.Model):
 class City(db.Model):
     __tablename__ = 'city'
     id = db.Column(db.Integer, primary_key=True)
-    # country = db.Column(db.String(70),nullable  = False)
     name = db.Column(db.String(70), nullable=False)
     # address_id = db.relationship('Address',backref = "Address")

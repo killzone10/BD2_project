@@ -120,8 +120,24 @@ def account():
 @login_required
 def delete():
     if request.method =="POST":
-        if request.form.get('Delete') == 'Delete':
-            user = User.query.filter_by(username =current_user.username).delete()
+        if request.form.get('Delete') == 'Delete':  
+
+            order_id = Order.query.filter(Order.user_id == current_user.id).all()
+            print(order_id)
+            for i in order_id:
+                print("I ID",i.id)
+                order_product = Product.query.join(product_has_order).join(Order).filter((product_has_order.c.order_id == i.id)).all()
+                invoice = Invoice.query.filter_by(order_id = i.id).delete()
+                for i,clear in enumerate(order_product):
+                    order_product[i].has_order.clear()
+                    db.session.commit()
+            
+          
+            db.session.commit()
+            order = Order.query.filter_by(user_id = current_user.id).delete()
+            db.session.commit()
+            
+            user = User.query.filter_by(username =current_user.username).delete()          
             db.session.commit()
             flash('Your account has been deleted','danger')
             return redirect(url_for('logout'))
@@ -149,29 +165,15 @@ def cart():
 
     if request.method =="GET":
         cart_id = current_user.cart_id
-        # products_id = Product.query.filter(Product.has_cart == cart_id).all()
-        # print(db.session.query(product_has_cart).join(Product).join(Cart).filter(Product.has_cart == cart_id))
-        # print((product_has_cart.c.cart_id))
         total_price = 0
         cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
         for price in cart_product:
             total_price = total_price + price.price
-        # print(cart_product)
-        # print(product_has_cart.cart.id)
-        # print(current_user.cart)
-        # print(current_user.cart_id)
-        # query_cart = Cart.query.join(product_has_cart).filter((product_has_cart.cart_id == Cart.id))
-        # result = db.session.query(Cart.id,Product.name).filter(product_has_cart.c.cart_id == Cart.id))
-        # print(cart_product)
-        # Product.query.join(product_has_cart).filter(Product.cart.id == cart_id)
-        # print("sesja:", db.session.query(product_has_cart).filter(product_has_cart.cart.id==1))
-        # cart = Cart.query.filter(Cart.id == id).all()
         return render_template('cart.html',title = "Cart", cart=cart_product,total_price=total_price)
     elif request.method =="POST":
         if request.form.get("Remove") == "Usuń":
             product_id = request.form.get("hidden")
             cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
-            # cart_product[int(product_id)].clear()
             cart_product[0].has_cart.clear()
             db.session.commit()
             flash(f'Produkt usunięty z koszyka!','success')
@@ -200,7 +202,6 @@ def order():
         total_price = total_price + price.price
     form = OrderForm()
     if form.validate_on_submit():
-        # city = City(country = form.country.data,name = form.city.data)
         city = City(name = form.city.data)
         db.session.add(city)
         db.session.commit()

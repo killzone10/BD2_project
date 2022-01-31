@@ -167,5 +167,5 @@
       Wanna go back? <a class="ml-2" href="{{ url_for('cart') }}">Return</a>
   </small>
 </div>
-<h3>Total price is: {{total_price}} </h3>
+<h3>Total price is: {{'%0.2f'|format(total_price)}} </h3>
 {% endblock body %}

@@ -197,7 +197,8 @@ def order():
         total_price = total_price + price.price
     form = OrderForm()
     if form.validate_on_submit():
-        city = City(country = form.country.data,name = form.city.data)
+        # city = City(country = form.country.data,name = form.city.data)
+        city = City(name = form.city.data)
         db.session.add(city)
         db.session.commit()
         adress = Address(street = form.street.data,house_nr=form.number.data,postal_code=form.postal_code.data,city_id=city.id)

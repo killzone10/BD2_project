@@ -22,7 +22,12 @@
                     <tr>
                         <br>
                         <h3>{{ result.name }}</h3>
-                        <p>{{ result.price }} zł</p>
+                        <h4>{{ result.price }} zł</h4>
+                        {% if result.quantity > 0 %}
+                            <p>Dostępny</p>
+                        {% else %}
+                            <p>Niedostępny</p>
+                        {% endif %}
                     </tr>
                     <form method="post" action="/add_to_cart">
                         <input type="hidden" name="hidden" value={{ result.id }}>

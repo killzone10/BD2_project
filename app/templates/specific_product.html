@@ -5,7 +5,7 @@
 {% block body %}
     <div>
         <form method="post" action="/products">
-            <input type="submit" class="btn-link" value="Wszystkie" name="product_type"/>->
+            <input type="submit" class="btn-link" value="Wszystkie" name="product_type"/> ->
             <input type="submit" class="btn-link" value={{ product_type }} name="product_type"/>
         </form>
     </div>
@@ -16,6 +16,11 @@
         <div id="div-right" class="product-description">
             <h1> {{ product.name }} </h1>
             <h2> {{ product.price }} zł </h2>
+            {% if product.quantity > 0 %}
+                <p>Dostępny</p>
+            {% else %}
+                <p>Niedostępny</p>
+            {% endif %}
             <p></p>
             <p> {{ product.description }} </p>
             <br>

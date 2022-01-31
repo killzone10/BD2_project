@@ -138,7 +138,14 @@ def add_to_cart():
             cart_id = current_user.cart_id
             product_update = Product.query.filter(Product.id == product_id).all()
             query_cart = Cart.query.filter(Cart.id == cart_id).all()
-            product_update[0].has_cart.append(query_cart[0])
+
+            pr_has_cart = Product_has_cart()
+            pr_has_cart.cart = query_cart[0]
+            pr_has_cart.product = product_update[0]
+            pr_has_cart.quantity = None
+
+            product_update[0].has_cart.append(pr_has_cart)
+
             db.session.commit()
             flash(f'Produkt dodany do koszyka!','success')
     return redirect(url_for('products')) 
@@ -153,7 +160,7 @@ def cart():
         # print(db.session.query(product_has_cart).join(Product).join(Cart).filter(Product.has_cart == cart_id))
         # print((product_has_cart.c.cart_id))
         total_price = 0
-        cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+        cart_product = Product.query.join(Product_has_cart).join(Cart).filter((Product_has_cart.cart_id == cart_id)).all()
         for price in cart_product:
             total_price = total_price + price.price
         # print(cart_product)
@@ -167,19 +174,17 @@ def cart():
         # print("sesja:", db.session.query(product_has_cart).filter(product_has_cart.cart.id==1))
         # cart = Cart.query.filter(Cart.id == id).all()
         return render_template('cart.html',title = "Cart", cart=cart_product,total_price=total_price)
-    elif request.method =="POST":
+    elif request.method == "POST":
         if request.form.get("Remove") == "Usuń":
             product_id = request.form.get("hidden")
-            print(product_id)
-            cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
-            print(cart_product)
-            # cart_product[int(product_id)].clear()
-            cart_product[0].has_cart.clear()
+
+            Product_has_cart.query.filter((Product_has_cart.product_id == product_id)).filter(
+                (Product_has_cart.cart_id == current_user.cart_id)).delete(synchronize_session='fetch')
+
             db.session.commit()
-            flash(f'Produkt usunięty z koszyka!','success')
-            return redirect(url_for('cart')) 
+            flash(f'Produkt usunięty z koszyka!', 'success')
+            return redirect(url_for('cart'))
         if request.form.get('Buy') == 'Zamów':
-           
             return redirect(url_for('order'))
 
 @app.route("/like",methods =['GET','POST'])
@@ -192,7 +197,7 @@ def like():
 def order():
     cart_id = current_user.cart_id
     total_price = 0
-    cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+    cart_product = Product.query.join(Product_has_cart).join(Cart).filter((Product_has_cart.cart_id == cart_id)).all()
     for price in cart_product:
         total_price = total_price + price.price
     form = OrderForm()
@@ -212,8 +217,9 @@ def order():
             product.has_order.append(order)
             db.session.commit()
 
-        for i,clear in enumerate(cart_product):
-            cart_product[i].has_cart.clear()
+
+        Product_has_cart.query.filter(
+            (Product_has_cart.cart_id == current_user.cart_id)).delete(synchronize_session='fetch')
 
         db.session.commit()
         # db.session.commit()

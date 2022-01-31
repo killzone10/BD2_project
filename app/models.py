@@ -12,10 +12,21 @@ product_is_favourite = db.Table('product_is_favourite', db.Model.metadata,
     db.Column('user_id', db.Integer,db.ForeignKey('user.id'))
     )
 
-product_has_cart = db.Table('product_has_cart', db.Model.metadata,
-    db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
-    db.Column('cart_id', db.Integer,db.ForeignKey('cart.id'))
-    )
+# product_has_cart = db.Table('product_has_cart', db.Model.metadata,
+#     db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
+#     db.Column('cart_id', db.Integer,db.ForeignKey('cart.id'))
+#     )
+
+# Base = declarative_base()
+class Product_has_cart(db.Model):
+    __tablename__ = 'product_has_cart'
+    product_id = Column(Integer, ForeignKey('product.id'), primary_key=True)
+    cart_id = Column(Integer, ForeignKey('cart.id'), primary_key=True)
+    product = relationship("Product", back_populates="has_cart")
+    cart = relationship("Cart", back_populates="has_product")
+
+    quantity = Column(Integer)
+
 
 product_has_order = db.Table('product_has_order', db.Model.metadata,
     db.Column('product_id', db.Integer,db.ForeignKey('product.id')),
@@ -32,7 +43,7 @@ class Product(db.Model):
 
     favourite = db.relationship("User",secondary = product_is_favourite)
     comments = db.relationship("Comment",backref = "Comment")
-    has_cart = db.relationship("Cart",secondary = product_has_cart)
+    has_cart = db.relationship("Product_has_cart",back_populates = "product")
     brand_id = db.Column(db.Integer,db.ForeignKey('brand.id'),nullable = True) ## sprawdz te nulle
     type_id = db.Column(db.Integer,db.ForeignKey('product_type.id'),nullable = True)
     has_order = db.relationship("Order", secondary = product_has_order)
@@ -107,6 +118,7 @@ class Cart(db.Model):
      __tablename__ ="cart"
      id = db.Column(db.Integer,primary_key = True)
      User = relationship("User",back_populates="cart",uselist = False)
+     has_product = db.relationship("Product_has_cart", back_populates="cart")
     #  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     #  user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
 

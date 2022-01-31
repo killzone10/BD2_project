@@ -152,8 +152,8 @@ select { width: 400px;
   text-align: center;
   box-sizing:border-box;
   width:60vw;
-  /*font-family:'Brush Script MT',cursive; */
-  font-family: 'Roboto', sans-serif;
+  font-family:'Brush Script MT',cursive;
+  /*font-family: 'Roboto', sans-serif;*/
 }
 
 .ind{

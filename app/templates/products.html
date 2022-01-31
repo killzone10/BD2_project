@@ -25,14 +25,14 @@
                         <h4>{{ result.price }} zł</h4>
                         {% if result.quantity > 0 %}
                             <p>Dostępny</p>
+                            <form method="post" action="/add_to_cart">
+                                <input type="hidden" name="hidden" value={{ result.id }}>
+                                <input type="submit" class=button2 value="Do koszyka" name="Add to cart">
+                            </form>
                         {% else %}
                             <p>Niedostępny</p>
                         {% endif %}
                     </tr>
-                    <form method="post" action="/add_to_cart">
-                        <input type="hidden" name="hidden" value={{ result.id }}>
-                        <input type="submit" class=button2 value="Do koszyka" name="Add to cart">
-                    </form>
                 </div>
 
             </div>

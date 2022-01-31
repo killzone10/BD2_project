@@ -24,10 +24,12 @@
             <p></p>
             <p> {{ product.description }} </p>
             <br>
-            <form method="post" action="/add_to_cart">
-                <input type="hidden" name="hidden" value={{ product.id }}>
-                <input type="submit" class=button2 value="Do koszyka" name="Add to cart">
-            </form>
+            {% if product.quantity > 0 %}
+                <form method="post" action="/add_to_cart">
+                    <input type="hidden" name="hidden" value={{ product.id }}>
+                    <input type="submit" class=button2 value="Do koszyka" name="Add to cart">
+                </form>
+            {% endif %}
         </div>
     </div>
     <button class=button2 onclick="history.back()">Powrót</button>

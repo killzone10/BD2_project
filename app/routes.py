@@ -210,8 +210,9 @@ def order():
         order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id = adress.id)      
         db.session.add(order)
         db.session.commit()
+
         if (form.invoice.data):
-            invoice = Invoice(data = datetime.date(datetime.now()),seller = "RYBEX", identification_number=form.nip.data,user_id = current_user.id,order_id=order.id)
+            invoice = Invoice(data = datetime.date(datetime.now()),seller = "RYBEX", identification_number=form.nip.data,order_id=order.id)
             db.session.add(invoice)
             db.session.commit()
         for products_update in cart_product:

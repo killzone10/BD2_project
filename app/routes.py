@@ -232,3 +232,16 @@ def order():
 
 
 
+@app.route("/my_order",methods =['GET','POST'])
+@login_required
+def my_order():
+    order = []
+    user_id = current_user.id
+    order_id = Order.query.filter(Order.user_id == user_id).all()
+    total_price = 0
+    for o in order_id:
+        order_product = Product.query.join(product_has_order).join(Order).filter((product_has_order.c.order_id == o.id)).all()
+        order.append(order_product)
+        for price in order_product:
+            total_price = total_price + price.price
+    return render_template("my_order.html",order = order,total_price = total_price)

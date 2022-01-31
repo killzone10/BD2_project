@@ -6,7 +6,7 @@
   <h1 class = "header"> Twój koszyk </h1>
   {% for item in cart %}
   <tr>
-    <p class="text-secondary"> Id: {{item.id}} Name: {{item.name}} Price: {{item.price}} </p>
+    <p class="text-secondary"><a href="/products/{{ item.id }}">  Id: {{item.id}} Name: {{item.name}} Price: {{item.price}} </a></p>
     <form method = "post" action ="/cart">
       <input type="hidden" name="hidden"  value={{item.id}}>
       <input type="submit" class ="Cart" value ="Remove"  name = "Remove" >

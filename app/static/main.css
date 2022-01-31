@@ -106,7 +106,7 @@ select { width: 400px;
   height: 50px;
   /* border: 3px solid #73AD21; */
   transition: all 0.5s 0s;
-  color: white;
+  color: black;
   background:rgb(135, 135, 238);
   border-radius: 15px;
  }
@@ -153,8 +153,8 @@ select { width: 400px;
   text-align: center;
   box-sizing:border-box;
   width:60vw;
-  /*font-family:'Brush Script MT',cursive; */
-  font-family: 'Roboto', sans-serif;
+  font-family:'Brush Script MT',cursive;
+  /* font-family: 'Roboto', sans-serif; */
 }
 
 .ind{

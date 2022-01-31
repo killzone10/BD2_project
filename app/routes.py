@@ -210,6 +210,12 @@ def order():
         order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id = adress.id)      
         db.session.add(order)
         db.session.commit()
+        for product in cart_product:
+            if (product.quantity == 0):
+                print("Error")
+            else:
+                product.quantity = product.quantity - 1
+                db.session.commit()
 
         if (form.invoice.data):
             invoice = Invoice(data = datetime.date(datetime.now()),seller = "RYBEX", identification_number=form.nip.data,order_id=order.id)
@@ -225,7 +231,6 @@ def order():
             cart_product[i].has_cart.clear()
 
         db.session.commit()
-        # db.session.commit()
         flash('Sucesfully created order','success')
         return redirect(url_for('index'))
     elif request.method == "GET":

@@ -15,5 +15,5 @@
 <p > 
     {% endfor %}
 {% endfor %}
-<p style="text-align:left;font-size: 30px;"> Total price is  : {{total_price}} </p> 
+<p style="text-align:left;font-size: 30px;"> Total price is  : {{'%0.2f'|format(total_price)}} </p> 
 {% endblock %}

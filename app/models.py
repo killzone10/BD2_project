@@ -22,14 +22,14 @@ product_has_order = db.Table('product_has_order', db.Model.metadata,
     db.Column('order_id', db.Integer,db.ForeignKey('order.id'))
     )
 class Product(db.Model):
-    __tablename__ ="product" 
+    __tablename__ ="product"
     id = db.Column(db.Integer,primary_key = True)
-    name = db.Column(db.String(25))
-    price = db.Column(db.Integer)
+    photo = db.Column(db.String(40))
+    name = db.Column(db.String(40))
+    price = db.Column(db.Float)
     quantity = db.Column(db.Integer)
-    description = db.Column(db.String(25))
+    description = db.Column(db.String(200))
 
-    
     favourite = db.relationship("User",secondary = product_is_favourite)
     comments = db.relationship("Comment",backref = "Comment")
     has_cart = db.relationship("Cart",secondary = product_has_cart)
@@ -39,7 +39,8 @@ class Product(db.Model):
     sectors = db.Column(db.Integer,db.ForeignKey('sector.id'),nullable = True)
     warehouses = db.Column(db.Integer,db.ForeignKey('warehouse.id'),nullable = True)
 
-    
+
+
     def __repr__(self):
         return f"Product('{self.name}','{self.price}','{self.quantity}')"
 
@@ -58,10 +59,10 @@ class Order(db.Model):
     adress_id = db.Column(db.Integer,db.ForeignKey("address.id"))
     address = relationship("Address")
     # phone = db.Column(db.Integer, nullable = True)
-    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False) 
+    user_id = db.Column(db.Integer,db.ForeignKey('user.id'), nullable = False)
     def __repr__(self):
         return f"Order('{self.date}','{self.total_price}','{self.adress_id}')"
-    
+
 
 class Invoice(db.Model):
     __tablename__="invoice"
@@ -80,49 +81,49 @@ class Invoice(db.Model):
     address = relationship("Address",backref = backref("Invoice",uselist = False))
     def __repr__(self):
         return f"Invoice('{self.data}','{self.seller}','{self.identification_number}')"
-    
+
 
 
 
 class Brand(db.Model):
     __tablename__="brand"
     id = db.Column(db.Integer,primary_key = True)
-    description= db.Column(db.String(25),nullable = False)
-    product_id = db.relationship('Product',backref = "Produkt")
+    name = db.Column(db.String(25),nullable = False)
+    # product_id = db.relationship('Product',backref = "Produkt")
     def __repr__(self):
         return f"Brand('{self.id}','{self.description}','{self.product_id}')"
-    
 
-class Product_type(db.Model):   
+
+class Product_type(db.Model):
     __tablename__="product_type"
     id = db.Column(db.Integer, primary_key = True)
-    title = db.Column(db.String(45), nullable = False) 
-    product_id = db.relationship('Product',backref = "Product_id")
-    parent = db.relationship('Product_type', remote_side=[id])
+    title = db.Column(db.String(45), nullable = False)
+    # product_id = db.relationship('Product',backref = "Product_id")
+    # parent = db.relationship('Product_type', remote_side=[id])
     parent_id = db.Column(db.Integer, db.ForeignKey('product_type.id'), nullable = True)
-    
+
 
 class Cart(db.Model):
-     __tablename__ ="cart" 
+     __tablename__ ="cart"
      id = db.Column(db.Integer,primary_key = True)
      User = relationship("User",back_populates="cart",uselist = False)
     #  user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     #  user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
-     
+
 
 
 
 class Comment(db.Model):
-    __tablename__ ="comment" 
+    __tablename__ ="comment"
     id = db.Column(db.Integer,primary_key=True)
-    description=db.Column(db.Text,unique=True,nullable=False) 
-    title = db.Column(db.String(100),nullable=False)  
+    description=db.Column(db.Text,unique=True,nullable=False)
+    title = db.Column(db.String(100),nullable=False)
     data_posted = db.Column(db.DateTime, nullable = False, default = datetime.datetime.now())
-    star_amount = db.Column(db.Integer) 
-    
+    star_amount = db.Column(db.Integer)
+
     user_id = db.Column(db.Integer,db.ForeignKey('user.id'),nullable = False) # tutaj id z clasy user
-    product_id = db.Column(db.Integer,db.ForeignKey('product.id'), nullable = False)    
-    
+    product_id = db.Column(db.Integer,db.ForeignKey('product.id'), nullable = False)
+
     def __repr__(self):
         return f"Comment('{self.title}','{self.data_posted}')"
 
@@ -136,9 +137,9 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 class User(db.Model,UserMixin): #1
-    __tablename__ ="user" 
-    id = db.Column(db.Integer,primary_key=True) 
-    username = db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
+    __tablename__ ="user"
+    id = db.Column(db.Integer,primary_key=True)
+    username = db.Column(db.String(20),unique=True,nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default
     password = db.Column(db.String(70),nullable=False)
     email = db.Column(db.String(20),unique=True,nullable=False)
     first_name = db.Column(db.String(40),nullable=True)
@@ -155,24 +156,25 @@ class User(db.Model,UserMixin): #1
 
     cart_id = db.Column(db.Integer, db.ForeignKey('cart.id'),unique = True)
     # cart = db.relationship("Cart",backref=backref("User", uselist=False))
-    cart = db.relationship("Cart",back_populates = "User")  
+    cart = db.relationship("Cart",back_populates = "User")
+    address_id = db.Column(db.Integer, db.ForeignKey('address.id'), nullable=True)
     # cart = db.relationship("Cart",uselist = False,backref = "user")
 
-    
+
 
 
     def __repr__(self): # wyspeciikujemy klase z relacja
         return f"User('{self.username}','{self.password}','{self.email}')"
 
 class Role(db.Model):
-    __tablename__ ="role" 
+    __tablename__ ="role"
     id = db.Column(db.Integer,primary_key=True)
-    username = db.Column(db.String(20),nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default 
+    username = db.Column(db.String(20),nullable=False)# unique  - jeden username dla jednego uzytkownika, nullable  =  musi istniec #default
 
 
 
 class Warehouse(db.Model):
-    __tablename__ ="warehouse" 
+    __tablename__ ="warehouse"
     id = db.Column(db.Integer, primary_key = True)
     max_capacity = db.Column(db.Integer, nullable=False)
     # address = db.Column(db.String(30), nullable=False)
@@ -181,12 +183,12 @@ class Warehouse(db.Model):
     sectors = db.relationship('Sector', backref = 'Warehouse')
 
     address_id = db.Column(db.Integer,db.ForeignKey('address.id'))
-    address = relationship("Address",backref = backref("Warehouse",uselist = False))
+    # address = relationship("Address",backref = backref("Warehouse",uselist = False))
     def __repr__(self):
         return f"Warehouse('{self.max_capacity}','{self.id}')"
 
 class Sector(db.Model):
-    __tablename__ ="sector" 
+    __tablename__ ="sector"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(20), nullable=False)
     max_capacity = db.Column(db.Integer, nullable=False)
@@ -198,12 +200,12 @@ class Sector(db.Model):
         return f"Sector('{self.max_capacity}','{self.name}')"
 
 class Worker(db.Model):
-    __tablename__ ="worker" 
+    __tablename__ ="worker"
     id = db.Column(db.Integer, primary_key = True)
     name = db.Column(db.String(20), nullable=False)
     surname = db.Column(db.String(20), nullable=False)
     position = db.Column(db.String(15), nullable=False) #!!! position zrobic jako odzielna encje w 3PN
-    
+
     parent_id = db.Column(db.Integer, db.ForeignKey('worker.id'), nullable = True)
     sector_id = db.Column(db.Integer,db.ForeignKey('sector.id'), nullable = False)
     parent = db.relationship('Worker', remote_side=[id])
@@ -213,24 +215,21 @@ class Worker(db.Model):
 
 class Address(db.Model):
     __tablename__ = "address"
-    id = db.Column(db.Integer, primary_key = True)
+    id = db.Column(db.Integer, primary_key=True)
     # country = db.Column(db.String(70),nullable  = False)
     # city = db.Column(db.String(70),nullable = False)
-    street = db.Column(db.String(70),nullable = True)
-    house_nr = db.Column(db.Integer, nullable = False) 
-    postal_code = db.Column(db.String(15), nullable = False)
+    street = db.Column(db.String(70), nullable=True)
+    house_nr = db.Column(db.Integer, nullable=False)
+    postal_code = db.Column(db.String(15), nullable=False)
     # postal_code = db.Column(db.String(15), nullable = False)
-    city_id = db.Column(db.Integer,db.ForeignKey('city.id'),nullable = False)
+    city_id = db.Column(db.Integer, db.ForeignKey('city.id'), nullable=False)
 
-
-    #city relationship
-    
+    # city relationship
 
 
 class City(db.Model):
-    __tablename__= 'city'
-    id = db.Column(db.Integer,primary_key=True)
-    country = db.Column(db.String(70),nullable  = False)
-    name = db.Column(db.String(70),nullable = False) 
+    __tablename__ = 'city'
+    id = db.Column(db.Integer, primary_key=True)
+    # country = db.Column(db.String(70),nullable  = False)
+    name = db.Column(db.String(70), nullable=False)
     # address_id = db.relationship('Address',backref = "Address")
-

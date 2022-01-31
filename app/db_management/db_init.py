@@ -36,7 +36,7 @@ rybia_zacheta = insert_brand("Rybia zachęta")
 rybie_przysmaki = insert_brand("Rybie Przysmaki")
 
 # products
-description1 = "Świetny Haczyk do łowienia. Złapiesz na niego każdą rybę, choć najlepiej łapie się na niego duże ryby. Trudno o lepszy haczyk!"
+description1 = "Świetny Haczyk do łowienia. Złapiesz na niego wszystko, choć najlepiej łapie się na niego duże ryby. Trudno o lepszy haczyk!"
 
 insert_product("Super Haczyk", "img/hooks/haczyk1.jpg", 12.34, 100, description1, type_id = haczyki.id, brand_id = captain_hook.id)
 insert_product("Haczyk 300X", "img/hooks/haczyk2.jpg", 20.00, 10, "Haczyk 300X to coś, co musisz mieć!", type_id=haczyki.id,

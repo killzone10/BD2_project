@@ -106,5 +106,8 @@ class OrderForm(FlaskForm):
 
     postal_code = StringField('Postal-Code  ',validators=[DataRequired(),Length(min = 2, max = 10)])
    
-   
+    invoice = BooleanField('Wanna invoice?')
+
+    nip = TelField("NIP",validators=[Length(max = 10)])
+    
     submit = SubmitField('Buy')

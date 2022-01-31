@@ -316,7 +316,7 @@ text-align: center;
     text-align: center;
     transition: all 0.15s;
     background: #3184fd;
-    border-radius: 15px;
+    border-radius: 10px;
 }
 
 .button2:hover {

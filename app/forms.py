@@ -13,12 +13,12 @@ class RegistrationForm(FlaskForm):
                             validators=[DataRequired(),Length(min = 2,max = 20)])
     email = StringField('Email',
                             validators=[DataRequired(),Email()])
-    password = PasswordField('Password',
+    password = PasswordField('Hasło',
                             validators=[DataRequired()])
-    confirm_password = PasswordField('Confirm Password',
+    confirm_password = PasswordField('Potwierdź hasło',
                                 validators=[DataRequired(),EqualTo('password')])
     
-    submit = SubmitField('Sign up')
+    submit = SubmitField('Zarejestruj się')
 
 
     def validate_username(self,username):
@@ -39,7 +39,7 @@ class LoginForm(FlaskForm):
     password = PasswordField('Password',
                             validators=[DataRequired()])
     remember = BooleanField('Remember Me')
-    submit = SubmitField('Log in ')
+    submit = SubmitField('Zaloguj się')
 
 
 class UpdateAccountForm(FlaskForm):
@@ -48,16 +48,16 @@ class UpdateAccountForm(FlaskForm):
     email = StringField('Email',
                             validators=[DataRequired(),Email()])
    
-    first_name = StringField('First name',
+    first_name = StringField('Imie',
                             validators=[DataRequired(),Length(min = 2, max = 20)])
 
-    second_name = StringField('Second name',
+    second_name = StringField('Nazwisko',
                             validators=[DataRequired(),Length(min = 2, max = 20)])
 
-    phone = TelField('Phone',validators=[DataRequired(),Length(min = 2, max = 10)])
+    phone = TelField('Numer telefonu',validators=[DataRequired(),Length(min = 2, max = 10)])
    
    
-    submit = SubmitField('Update')
+    submit = SubmitField('Aktualizuj')
 
 
     def validate_username(self,username):
@@ -83,31 +83,31 @@ class OrderForm(FlaskForm):
     email = StringField('Email',
                             validators=[DataRequired(),Email()])
    
-    first_name = StringField('First name',
+    first_name = StringField('Imie',
                             validators=[DataRequired(),Length(min = 2, max = 20)])
 
-    second_name = StringField('Second name',
+    second_name = StringField('Nazwisko',
                             validators=[DataRequired(),Length(min = 2, max = 20)])
 
-    phone = TelField('Phone',validators=[DataRequired(),Length(min = 2, max = 10)])
+    phone = TelField('Numer telefonu',validators=[DataRequired(),Length(min = 2, max = 10)])
 
 
-    country = StringField('Country',
+    country = StringField('Kraj',
                             validators=[DataRequired(),Length(min = 2,max = 40)])
 
-    city = StringField('City',
+    city = StringField('Miasto',
                             validators=[DataRequired(),Length(min = 2,max = 40)])
 
 
-    street = StringField('Street',
+    street = StringField('Ulica',
                             validators=[DataRequired(),Length(min = 2,max = 40)])
 
-    number = TelField('Number',validators=[DataRequired(),Length(min = 2, max = 10)])
+    number = TelField('Numer mieszkania',validators=[DataRequired(),Length(min = 2, max = 10)])
 
-    postal_code = StringField('Postal-Code  ',validators=[DataRequired(),Length(min = 2, max = 10)])
+    postal_code = StringField('Kod pocztowy',validators=[DataRequired(),Length(min = 2, max = 10)])
    
-    invoice = BooleanField('Wanna invoice?')
+    invoice = BooleanField('Czy potrzebujesz faktury?')
 
     nip = TelField("NIP",validators=[Length(max = 10)])
     
-    submit = SubmitField('Buy')
+    submit = SubmitField('Kup')

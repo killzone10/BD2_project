@@ -3,9 +3,9 @@
 {%endblock%}
 {% block body %}
 {% set price = 0 %}
-  <h1 class = "header"> Your order: </h1>
+  <h1 class = "header"> Twoje zamówienia: </h1>
   {% for item in order %}
-   <p class="text-secondary"> Order </p>
+   <p class="text-secondary" style = " font-size: 30px;"> Zamówienie:  </p>
   <tr>
     {% for i in item %}
     <p class="text-secondary"> <a href="/products/{{ i.id }}"> Nazwa: {{i.name}}  Amount: Cena: {{i.price}} </a></p>

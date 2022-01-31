@@ -18,7 +18,7 @@
                     </tr>
                     <form method="post" action="/cart">
                         <input type="hidden" name="hidden" value={{ item.id }}>
-                        <input type="submit" class=button2 value="Remove" name="Remove">
+                        <input type="submit" class=button2 value="Usuń" name="Remove">
                     </form>
                 </div>
 
@@ -30,7 +30,7 @@
     <div>
         <p> Total price is : {{ total_price }}</p>
         <form method="post" action="/cart">
-            <input type="submit" class="submit" value="Buy" name="Buy"/>
+            <input type="submit" class="submit" value="Zamów" name="Buy"/>
         </form>
     </div>
 {% endblock %}

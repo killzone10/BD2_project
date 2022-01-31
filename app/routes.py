@@ -12,13 +12,13 @@ from datetime import datetime,date
 @app.route("/", methods=['POST', 'GET'])
 def index():
     if request.method == 'POST':
-        if request.form.get('Log') == 'Log in':
+        if request.form.get('Log') == 'Zaloguj':
             return redirect(url_for('login'))   
-        elif request.form.get('Sign') == 'Sign in':
+        elif request.form.get('Sign') == 'Zarejestruj':
             return redirect(url_for('register'))
-        elif request.form.get('Products') == 'Products':
+        elif request.form.get('Products') == 'Produkty':
             return redirect(url_for('products'))
-        elif request.form.get('Cart') == 'Cart':
+        elif request.form.get('Cart') == 'Koszyk':
             return redirect(url_for('cart'))
     elif request.method == 'GET':
         return render_template('index.html')
@@ -133,14 +133,14 @@ def delete():
 @login_required
 def add_to_cart():
     if request.method =="POST":
-        if request.form.get("Add to cart") == "Add to cart":
+        if request.form.get("Add to cart") == "Do koszyka":
             product_id = request.form.get("hidden")
             cart_id = current_user.cart_id
             product_update = Product.query.filter(Product.id == product_id).all()
             query_cart = Cart.query.filter(Cart.id == cart_id).all()
             product_update[0].has_cart.append(query_cart[0])
             db.session.commit()
-            flash(f'Product has been added to cart!','success')
+            flash(f'Produkt dodany do koszyka!','success')
     return redirect(url_for('products')) 
 
 @app.route("/cart",methods=['GET', 'POST'])
@@ -168,7 +168,7 @@ def cart():
         # cart = Cart.query.filter(Cart.id == id).all()
         return render_template('cart.html',title = "Cart", cart=cart_product,total_price=total_price)
     elif request.method =="POST":
-        if request.form.get("Remove") == "Remove":
+        if request.form.get("Remove") == "Usuń":
             product_id = request.form.get("hidden")
             print(product_id)
             cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
@@ -176,9 +176,9 @@ def cart():
             # cart_product[int(product_id)].clear()
             cart_product[0].has_cart.clear()
             db.session.commit()
-            flash(f'Product has been deleted from cart!','success')
+            flash(f'Produkt usunięty z koszyka!','success')
             return redirect(url_for('cart')) 
-        if request.form.get('Buy') == 'Buy':
+        if request.form.get('Buy') == 'Zamów':
            
             return redirect(url_for('order'))
 

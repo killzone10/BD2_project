@@ -170,17 +170,20 @@ def cart():
     elif request.method =="POST":
         if request.form.get("Remove") == "Usuń":
             product_id = request.form.get("hidden")
-            print(product_id)
             cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.product_id == product_id)).all()
-            print(cart_product)
             # cart_product[int(product_id)].clear()
             cart_product[0].has_cart.clear()
             db.session.commit()
             flash(f'Produkt usunięty z koszyka!','success')
             return redirect(url_for('cart')) 
         if request.form.get('Buy') == 'Zamów':
-           
-            return redirect(url_for('order'))
+            cart_id = current_user.cart_id
+            cart_product = Product.query.join(product_has_cart).join(Cart).filter((product_has_cart.c.cart_id == cart_id)).all()
+            if(len(cart_product) == 0 ):
+                flash(f'No product in cart','danger')
+                return redirect(url_for('cart'))
+            else:
+                return redirect(url_for('order'))
 
 @app.route("/like",methods =['GET','POST'])
 @login_required
@@ -206,6 +209,11 @@ def order():
         db.session.commit()
         order = Order(date = datetime.date(datetime.now()),status = 1,total_price = total_price ,user_id =current_user.id,adress_id = adress.id)      
         db.session.add(order)
+        db.session.commit()
+        if (form.invoice.data):
+            invoice = Invoice(data = datetime.date(datetime.now()),seller = "RYBEX", identification_number=form.nip.data,user_id = current_user.id,order_id=order.id)
+            db.session.add(invoice)
+            db.session.commit()
         for products_update in cart_product:
             p = products_update.id
             product = Product.query.filter_by(id = p).first()
@@ -233,3 +241,16 @@ def order():
 
 
 
+@app.route("/my_order",methods =['GET','POST'])
+@login_required
+def my_order():
+    order = []
+    user_id = current_user.id
+    order_id = Order.query.filter(Order.user_id == user_id).all()
+    total_price = 0
+    for o in order_id:
+        order_product = Product.query.join(product_has_order).join(Order).filter((product_has_order.c.order_id == o.id)).all()
+        order.append(order_product)
+        for price in order_product:
+            total_price = total_price + price.price
+    return render_template("my_order.html",order = order,total_price = total_price)

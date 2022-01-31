@@ -3,7 +3,17 @@
 
 {%endblock%}
 {% block body %}
-
+<script>
+    function checkMe(){
+        var cb =document.getElementById("form.invoice.label");
+        if (cb.checked ==true ){
+            style.display ="block";
+        }
+        else{
+            style.display="none";
+        }
+    }
+</script>
 <div class="content-section">
   <form method="POST" action="">
       {{ form.hidden_tag() }}
@@ -123,10 +133,26 @@
                     {% endfor %}
                 </div>
             {% else %}
-                {{ form.postal_code(class="form-control form-control-lg") }}
+                {{ form.postal_code(class="form-control form-control-lg") }}    
             {% endif %}
         </div>
-         
+        <div class="form-check">
+            {{ form.invoice(class="form-check-input" ) }}
+            {{ form.invoice.label(class="form-check-label") }}
+        </div>
+        <div class="form-group">
+            {{ form.nip.label(class="form-control-label") }}
+            {% if form.nip.errors %}
+                {{ form.nip(class="form-control form-control-lg is-invalid") }}
+                <div class="invalid-feedback">
+                    {% for error in form.nip.errors %}
+                        <span>{{ error }}</span>
+                    {% endfor %}
+                </div>
+            {% else %}
+                {{ form.nip(class="form-control form-control-lg") }}
+            {% endif %}
+        </div>
       </fieldset>
       <div class="form-group" style ="text-align: right ;">
           {{ form.submit(class="btn btn-outline-success") }}

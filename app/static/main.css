@@ -105,14 +105,13 @@ select { width: 400px;
   width: 150px;
   height: 50px;
   /* border: 3px solid #73AD21; */
-  /*transition: all 0.5s 0s;*/
-  color: green;
-  background: white;
-  border-radius: 10px;
-  border-color: #4CAF50;
+  transition: all 0.5s 0s;
+  color: black;
+  background:rgb(135, 135, 238);
+  border-radius: 15px;
  }
  .submit:hover{
-   background: darkseagreen;
+   background:#0b0bf0;
    color:#ffffff;
  }
  .button {

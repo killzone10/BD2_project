@@ -8,5 +8,9 @@ The user that comes to the site can sign up, check products, check the cart, rem
 
 Used bootstrap and some CSS, but rather focused on backend. 
 
-## TO DO##
+## TO DO
 Actually its not much - deplyoing on Heroku and add some features.
+
+
+## To run
+To run you have to pip install requirments.txt and have postgres database with correcnt name on correct port.

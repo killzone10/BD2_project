@@ -1,6 +1,6 @@
 # BD2_project
 
-This project is  about database created for in SQL_Alchemy that works on POSTGRES (used pgAdmin4) and web application connected to this database. 
+This project is  contains database created in SQL_Alchemy - POSTGRES (used pgAdmin4) and web application connected to this database. 
 
 ## Fish_shop ##
 
